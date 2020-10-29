@@ -1,0 +1,8 @@
+*.xlsx
+*.csv
+*.png
+*.pdf
+.deps-installed
+.snakemake
+*.zip
+manuscript
