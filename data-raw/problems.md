@@ -56,6 +56,10 @@ Case 228 (34, 35)
 
 - Cases 7, 82, 98, 143, 213 and 222 change gender
 
+- A number of cases are under 18 (as low as 1)
+  in 2017 and only in 2017. Don't know if this
+  is how it's meant to be.
+
 # Serology 2018
 
 - Case 96 changes age from 37 to 39
