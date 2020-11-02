@@ -14,6 +14,33 @@ save_plot <- function(plot, name, ...) {
   )
 }
 
+wrap_virus_names <- function(names) {
+  names %>% str_replace_all("/", "/\n")
+}
+
+titre_plot <- function(data) {
+  data %>%
+    ggplot(aes(visit, titre, group = id)) +
+    theme_bw() +
+    theme(
+      strip.background = element_blank(),
+      panel.grid.minor = element_blank(),
+      legend.position = "none"
+    ) +
+    scale_y_log10("Titre", breaks = 5 * 2^(0:10)) +
+    scale_x_continuous("Visit") +
+    facet_grid(study_year ~ virus, labeller = as_labeller(wrap_virus_names)) +
+    geom_line(aes(col = id), alpha = 0.5) +
+    geom_point(alpha = 0.5)
+}
+
+arrange <- function(...) {
+  ggdark::lighten_geoms()
+  arr <- ggpubr::ggarrange(...)
+  ggdark::darken_geoms()
+  arr
+}
+
 # Script ======================================================================
 
 subject <- read_data("subject")
@@ -33,3 +60,13 @@ age_hist <- subject %>%
   geom_histogram(binwidth = 1)
 
 save_plot(age_hist, "age-hist", width = 15, height = 7)
+
+titre <- read_data("titre")
+
+titre_plots <- titre %>%
+  group_split(study_year) %>%
+  map(titre_plot)
+
+titre_plots_arranged <- arrange(plotlist = titre_plots, ncol = 1)
+
+save_plot(titre_plots_arranged, "titre", width = 50, height = 25)

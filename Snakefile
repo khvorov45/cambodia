@@ -27,6 +27,7 @@ rule data_plot:
         "data/read_data.R",
     output:
         "data-plot/age-hist.pdf",
+        "data-plot/titre.pdf",
     shell:
         "Rscript data-plot/data-plot.R"
 
