@@ -1,5 +1,7 @@
 cat("make tables")
 
+library(tidyverse)
+
 # Functions ===================================================================
 
 source("data/read_data.R")

@@ -1,0 +1,56 @@
+rule install_deps:
+    input:
+        "renv.lock"
+    output:
+        touch(".deps-installed")
+    shell:
+        """Rscript -e 'renv::restore()'"""
+
+rule data:
+    input:
+        ".deps-installed",
+        "data/data.R",
+        "data-raw/responses-2015.csv",
+        "data-raw/responses-2017.csv",
+        "data-raw/serology.xlsx",
+    output:
+        "data/subject.csv",
+        "data/titre.csv",
+    shell:
+        "Rscript data/data.R"
+
+rule data_plot:
+    input:
+        ".deps-installed",
+        "data-plot/data-plot.R",
+        "data/subject.csv",
+        "data/read_data.R",
+    output:
+        "data-plot/age-hist.pdf",
+    shell:
+        "Rscript data-plot/data-plot.R"
+
+rule data_table:
+    input:
+        ".deps-installed",
+        "data-table/data-table.R",
+        "data/subject.csv",
+        "data/read_data.R",
+    output:
+        "data-table/summaries.csv",
+    shell:
+        "Rscript data-table/data-table.R"
+
+rule zip:
+    input:
+        rules.data.output,
+        rules.data_plot.output,
+        rules.data_table.output,
+    output:
+        "cambodia.zip"
+    shell:
+        "zip -r cambodia.zip . -x 'renv/library*' '.snakemake*' '.deps-installed'"
+
+rule all:
+    input:
+        rules.zip.output

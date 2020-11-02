@@ -1,5 +1,7 @@
 cat("plot the data")
 
+library(tidyverse)
+
 # Functions ===================================================================
 
 source("data/read_data.R")
