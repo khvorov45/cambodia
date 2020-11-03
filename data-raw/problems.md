@@ -25,6 +25,8 @@ Case 100 (37, 35)
 
 - Cases 50 and 96 change gender
 
+- ID R1105S is present in serology but not in the survey
+
 # Serology 2017
 
 - Cases 19 and 20 repeat (i.e. it goes ..., 17, 18, 19, 20, 19, 20, 21, ...)
@@ -82,3 +84,27 @@ Case 96 (37, 39)
 "5K-24-1-H08" "5K-24-1-H09" "5K-24-1-H10" "5K-24-1-H11" "5T-24-3-H18" "5T-24-3-H19" "5T-24-3-H20"
 "5T-24-3-H21" "5T-24-3-H22" "5T-24-3-H23" "5T-24-3-H24" "5T-24-3-H25" "5T-24-3-H26" "5T-24-3-H27"
 "5T-24-3-H28" "5T-24-3-H29" "5T-24-3-H30" "5T-24-7-H01"
+
+# Serology in general
+
+- Age and gender columns are not necessary because they repeat themeselves and
+  they repeat information that's already in the survey.
+  Their presense in serology
+  introduces the possibility of conflicts due to data entry errors and is
+  therefore detrimental to data integrity.
+
+- Virus names are coded inconsistently between different years, for example:
+
+A/duck Cambodia/33W2M3/2013 (2015 data)
+A/duck/ Cambodia/33W2M3/2013 (2017 data)
+A/duck Cambodia/33W2M3/2013 (2018 data)
+
+B/Phuket/3073/2013-like virus (2015 data)
+B/Phuket/3073/2013-like (2017 data)
+B/Phuket/3073/2013-like virus (2018 data)
+
+- "No serum" is sometimes "No serun" (e.g. in 2017 data)
+
+- ID's have the last number left-padded with zeros in the 2018 data but not
+  in the 2017 data nor in the survey
+  (e.g. 1K-22-1-H1 (2017) -> 1K-22-1-H01 (2018, survey))

@@ -121,6 +121,37 @@ extract_virus_names <- function(data, year) {
 
 # 2015 ------------------------------------------------------------------------
 
+# Survey
+
+responses_2015 <- read_raw("responses-2015", "csv", col_types = cols()) %>%
+  select(
+    id = idcode2015,
+    gender = n12gender,
+    age_years = n10ageyear,
+  ) %>%
+  mutate(
+    gender_og = gender,
+    gender = recode(gender, "1" = "M", "2" = "F"),
+  )
+
+# Extract subjects
+
+subjects_2015 <- responses_2015 %>%
+  select(id, gender, age_years) %>%
+  mutate(study_year = 2015)
+
+# Should be no duplicate ids
+subjects_2015 %>% check_no_duplicates(id)
+
+# Check gender
+subjects_2015$gender %>% unique()
+
+# Check age
+subjects_2015$age_years %>% summary()
+
+# Should be no missing data
+subjects_2015 %>% filter(!complete.cases(.))
+
 serology_2015 <- read_raw(
   "serology",
   sheet = "2015_Result S1-S4", range = "A4:P510"
@@ -166,18 +197,6 @@ serology_2015 %>% check_unique(case, gender)
 # Check that gender is either F or M
 unique(serology_2015$gender)
 
-# Extract participant info
-subjects_2015 <- serology_2015 %>%
-  select(id, age_years, gender) %>%
-  keep_first_row(id) %>%
-  mutate(study_year = 2015)
-
-# Shouldn't be any duplicate ids
-subjects_2015 %>% check_no_duplicates(id)
-
-# Check for missing data
-subjects_2015 %>% filter(!complete.cases(.))
-
 # Titres
 titres_2015 <- serology_2015 %>%
   extract_titres() %>%
@@ -188,6 +207,9 @@ titres_2015 %>% filter(!id %in% subjects_2015$id)
 
 # Check that there is no missing data
 titres_2015 %>% filter(!complete.cases(.))
+
+# All ids should be in subjects
+titres_2015 %>% filter(!id %in% subjects_2015$id)
 
 # 2017 Onwards ----------------------------------------------------------------
 
@@ -310,7 +332,7 @@ serology_2018 %>%
   group_by(case) %>%
   filter(
     any(visit_og > 4),
-    !id %in% serology_2017$id,
+    !id %in% filter(subjects_2017_plus, study_year == 2017)$id,
     id_sample == first(id_sample)
   ) %>%
   pull(id_sample) %>%
