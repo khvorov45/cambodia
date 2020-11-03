@@ -77,7 +77,7 @@ Case 96 (37, 39)
 
 - Everyone with visit 5+ is implied to have had visits 1-4 in 2017. The
   following ids have visits labelled as 5+ but no corresponding entry in 2017
-  data:
+  serology data:
 
 "5K-24-1-H08" "5K-24-1-H09" "5K-24-1-H10" "5K-24-1-H11" "5T-24-3-H18" "5T-24-3-H19" "5T-24-3-H20"
 "5T-24-3-H21" "5T-24-3-H22" "5T-24-3-H23" "5T-24-3-H24" "5T-24-3-H25" "5T-24-3-H26" "5T-24-3-H27"
