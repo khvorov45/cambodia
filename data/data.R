@@ -4,8 +4,12 @@ library(tidyverse)
 
 # Functions ===================================================================
 
-read_raw <- function(name, ...) {
-  readxl::read_excel(glue::glue("data-raw/{name}.xlsx"), ...)
+read_raw <- function(name, ext = "xlsx", ...) {
+  path <- glue::glue("data-raw/{name}.{ext}")
+  if (ext == "xlsx") {
+    return(readxl::read_excel(path, ...))
+  }
+  read_csv(path, ...)
 }
 
 keep_first_row <- function(data, ...) {
@@ -187,6 +191,44 @@ titres_2015 %>% filter(!complete.cases(.))
 
 # 2017 Onwards ----------------------------------------------------------------
 
+# Survey
+
+responses_2017_plus <- read_raw(
+  "responses-2017", "csv",
+  col_types = cols()
+) %>%
+  select(
+    id = idcode,
+    age_years = n10ageyear,
+    gender = n12gender,
+    date_interview = n1intervie,
+  ) %>%
+  mutate(
+    # Remove visit indicator from id
+    id_og = id,
+    id = str_replace(id, "^\\d+", ""),
+    gender_og = gender,
+    gender = recode(gender, "1" = "M", "2" = "F"),
+    date_interview_og = date_interview,
+    date_interview = parse_date(date_interview, "%d%b%Y"),
+  )
+
+subjects_2017_plus <- responses_2017_plus %>%
+  mutate(study_year = lubridate::year(date_interview)) %>%
+  select(id, age_years, gender, study_year)
+
+# Should be no missing data
+subjects_2017_plus %>% filter(!complete.cases(.))
+
+# Check gender
+unique(subjects_2017_plus$gender)
+
+# Check age
+summary(subjects_2017_plus$age_years)
+
+# Check that ids don't repeat within a year
+subjects_2017_plus %>% check_no_duplicates(id, study_year)
+
 read_serology_2017_plus <- function(sheet, range) {
   read_raw(
     "serology",
@@ -204,7 +246,9 @@ read_serology_2017_plus <- function(sheet, range) {
     fill(case) %>%
     mutate(
       # Extract visit from id
-      id = str_replace(id_sample, "^\\d", "") %>% toupper(),
+      id = str_replace(id_sample, "^\\d", "") %>%
+        toupper() %>%
+        str_replace_all("-", ""),
       visit = str_replace(id_sample, "^(\\d).*", "\\1") %>% as.integer(),
       # Convert titres to character
       across(c(contains("A/"), contains("B/")), as.character),
@@ -272,22 +316,6 @@ serology_2018 %>%
   pull(id_sample) %>%
   unique()
 
-# Extract 2017+ participants
-
-subjects_2017 <- serology_2017 %>%
-  select(id, age_years, gender) %>%
-  keep_first_row(id) %>%
-  mutate(study_year = 2017)
-
-subjects_2018 <- serology_2018 %>%
-  select(id, age_years, gender) %>%
-  keep_first_row(id) %>%
-  mutate(study_year = 2018)
-
-# Shouldn't be any duplicate ids
-subjects_2017 %>% check_no_duplicates(id)
-subjects_2018 %>% check_no_duplicates(id)
-
 # Extract 2017+ titres
 
 titres_2017 <- serology_2017 %>%
@@ -299,13 +327,13 @@ titres_2018 <- serology_2018 %>%
   mutate(study_year = 2018)
 
 # Ids should correspond to subjects
-titres_2017 %>% filter(!id %in% subjects_2017$id)
-titres_2018 %>% filter(!id %in% subjects_2018$id)
+titres_2017 %>% filter(!id %in% subjects_2017_plus$id)
+titres_2018 %>% filter(!id %in% subjects_2017_plus$id)
 
 # Combine ---------------------------------------------------------------------
 
 # Combine all participants
-subjects <- bind_rows(list(subjects_2015, subjects_2017, subjects_2018))
+subjects <- bind_rows(list(subjects_2015, subjects_2017_plus))
 # Combine all titres
 titres <- bind_rows(list(titres_2015, titres_2017, titres_2018))
 
