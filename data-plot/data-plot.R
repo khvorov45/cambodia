@@ -18,7 +18,7 @@ wrap_virus_names <- function(names) {
   names %>% str_replace_all("/", "/\n")
 }
 
-titre_plot <- function(data) {
+titre_plot <- function(data, min_y, max_y) {
   data %>%
     mutate(
       virus_lbl = paste0(virus, "\n", clade) %>% fct_reorder(as.integer(virus))
@@ -30,6 +30,7 @@ titre_plot <- function(data) {
       panel.grid.minor = element_blank(),
       legend.position = "none"
     ) +
+    coord_cartesian(ylim = c(min_y, max_y)) +
     scale_y_log10("Titre", breaks = 5 * 2^(0:10)) +
     scale_x_continuous("Visit") +
     facet_grid(study_year ~ virus_lbl, labeller = as_labeller(wrap_virus_names)) +
@@ -68,7 +69,7 @@ titre <- read_data("titre")
 
 titre_plots <- titre %>%
   group_split(study_year) %>%
-  map(titre_plot)
+  map(titre_plot, min(titre$titre), max(titre$titre))
 
 titre_plots_arranged <- arrange(plotlist = titre_plots, ncol = 1)
 
