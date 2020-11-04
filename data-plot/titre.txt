@@ -1,1 +1,1 @@
-Antibody titres per virus per year. Lines connect one individual's observations.
+Antibody titres per virus per year. Lines connect one individual's observations. The number in the top-left is the number of individuals.

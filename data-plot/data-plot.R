@@ -19,11 +19,20 @@ wrap_virus_names <- function(names) {
 }
 
 titre_plot <- function(data, min_y, max_y) {
-  data %>%
+  data_mod <- data %>%
     mutate(
       virus_lbl = paste0(virus, "\n", clade) %>% fct_reorder(as.integer(virus))
-    ) %>%
-    ggplot(aes(visit, titre, group = id)) +
+    )
+  sample_sizes <- data_mod %>%
+    group_by(study_year, virus_lbl) %>%
+    summarise(
+      n_ind = length(unique(id)),
+      visit = 1,
+      titre = 2560,
+      .groups = "drop"
+    )
+  data_mod %>%
+    ggplot(aes(visit, titre)) +
     theme_bw() +
     theme(
       strip.background = element_blank(),
@@ -35,7 +44,8 @@ titre_plot <- function(data, min_y, max_y) {
     scale_x_continuous("Visit") +
     facet_grid(study_year ~ virus_lbl, labeller = as_labeller(wrap_virus_names)) +
     geom_line(aes(col = id), alpha = 0.5) +
-    geom_point(alpha = 0.5)
+    geom_point(alpha = 0.5) +
+    geom_text(data = sample_sizes, mapping = aes(label = n_ind), hjust = 0)
 }
 
 arrange <- function(...) {
