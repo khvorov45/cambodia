@@ -99,14 +99,20 @@ fix_virus_names <- function(viruses) {
     str_replace("-like.*$", "-like")
 }
 
+fix_clades <- function(clades) {
+  clades %>%
+    str_replace("^.*\\s+\\((.*)\\s*$", "(\\1") %>%
+    str_replace_all("\\(|\\)", "") %>%
+    str_replace_all("/|_", " ")
+}
+
 extract_titres <- function(data) {
   data %>%
     select(id, visit, contains("A/"), contains("B/")) %>%
     lengthen_titres() %>%
     mutate(
       titre = fix_titres(titre),
-      clade = str_replace(virus, "^.*\\s+\\((.*)\\s*$", "(\\1") %>%
-        str_replace_all("\\(|\\)", ""),
+      clade = fix_clades(virus),
       virus = fix_virus_names(virus)
     ) %>%
     filter(!is.na(titre))

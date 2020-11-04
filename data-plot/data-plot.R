@@ -20,6 +20,9 @@ wrap_virus_names <- function(names) {
 
 titre_plot <- function(data) {
   data %>%
+    mutate(
+      virus_lbl = paste0(virus, "\n", clade) %>% fct_reorder(as.integer(virus))
+    ) %>%
     ggplot(aes(visit, titre, group = id)) +
     theme_bw() +
     theme(
@@ -29,7 +32,7 @@ titre_plot <- function(data) {
     ) +
     scale_y_log10("Titre", breaks = 5 * 2^(0:10)) +
     scale_x_continuous("Visit") +
-    facet_grid(study_year ~ virus, labeller = as_labeller(wrap_virus_names)) +
+    facet_grid(study_year ~ virus_lbl, labeller = as_labeller(wrap_virus_names)) +
     geom_line(aes(col = id), alpha = 0.5) +
     geom_point(alpha = 0.5)
 }
