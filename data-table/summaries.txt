@@ -1,0 +1,4 @@
+Baseline characteristics for each year's sample. Taken from survey responses. Age taken from the first column that contained it.
+Format:
+mean ± SD
+count (percentage) value
