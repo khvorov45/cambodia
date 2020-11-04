@@ -105,6 +105,8 @@ extract_titres <- function(data) {
     lengthen_titres() %>%
     mutate(
       titre = fix_titres(titre),
+      clade = str_replace(virus, "^.*\\s+\\((.*)\\s*$", "(\\1") %>%
+        str_replace_all("\\(|\\)", ""),
       virus = fix_virus_names(virus)
     ) %>%
     filter(!is.na(titre))
