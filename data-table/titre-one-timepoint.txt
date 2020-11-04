@@ -1,0 +1,4 @@
+Summaries for each timapoint for each year for each virus.
+Format:
+mean (95% CI)
+success / total percentage (95% CI - beta approximation)

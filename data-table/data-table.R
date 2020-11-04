@@ -27,6 +27,19 @@ summarise_factor <- function(fac) {
   map(sort(unique(fac)), one_level) %>% paste(collapse = "; ")
 }
 
+summarise_binary <- function(bin_vec) {
+  total <- length(bin_vec)
+  success <- sum(bin_vec)
+  failure <- total - success
+  point <- success / total
+  low <- min(qbeta(0.025, success + 1, failure + 1), point)
+  high <- max(qbeta(0.975, success + 1, failure + 1), point)
+  glue::glue(
+    "{success} / {total} ",
+    "{format_percent(point)} ({format_percent(low)}, {format_percent(high)})"
+  )
+}
+
 save_data <- function(data, name) {
   write_csv(data, glue::glue("data-table/{name}.csv"))
   data
@@ -47,3 +60,29 @@ subject %>%
   pivot_longer(-study_year, names_to = "stat", values_to = "summ") %>%
   pivot_wider(names_from = "study_year", values_from = "summ") %>%
   save_data("subject")
+
+titre <- read_data("titre")
+
+summarise_gmt <- function(titres) {
+  logtitres <- log(titres)
+  logmn <- mean(logtitres)
+  logse <- sd(logtitres) / sqrt(length(titres))
+  q <- qnorm(0.975)
+  glue::glue(
+    "{format_decimal(exp(logmn))} ",
+    "({format_decimal(exp(logmn - q * logse))}, ",
+    "{format_decimal(exp(logmn + q * logse))})",
+  )
+}
+
+# Summaries that only involve one timepoint
+
+titre %>%
+  group_by(study_year, virus, clade, visit) %>%
+  summarise(
+    n_individuals = length(unique(id)),
+    gmt = summarise_gmt(titre),
+    titre_above_40 = summarise_binary(titre >= 40),
+    .groups = "drop"
+  ) %>%
+  save_data("titre-one-timepoint")
