@@ -38,7 +38,7 @@ rule data_table:
         "data/subject.csv",
         "data/read_data.R",
     output:
-        "data-table/summaries.csv",
+        "data-table/subject.csv",
     shell:
         "Rscript data-table/data-table.R"
 

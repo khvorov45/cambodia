@@ -46,4 +46,4 @@ subject %>%
   ) %>%
   pivot_longer(-study_year, names_to = "stat", values_to = "summ") %>%
   pivot_wider(names_from = "study_year", values_from = "summ") %>%
-  save_data("summaries")
+  save_data("subject")
