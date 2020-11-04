@@ -36,13 +36,12 @@ check_unique <- function(data, v1, v2) {
     summarise(reps = paste_unique(!!rlang::enquo(v2)), .groups = "drop")
 }
 
-check_no_duplicates <- function(data, var_name, group_vars = c()) {
-  group_vars_q <- rlang::enquos(group_vars)
+check_no_duplicates <- function(data, var_name, ...) {
   var_name_q <- rlang::enquo(var_name)
   data %>%
-    group_by(!!!group_vars_q, !!var_name_q) %>%
+    group_by(!!var_name_q, ...) %>%
     filter(n() != 1) %>%
-    group_by(!!!group_vars_q) %>%
+    group_by(...) %>%
     summarise(reps = paste(!!var_name_q, collapse = ", "), .groups = "drop")
 }
 
@@ -219,6 +218,9 @@ titres_2015 %>% filter(!complete.cases(.))
 # All ids should be in subjects
 titres_2015 %>% filter(!id %in% subjects_2015$id)
 
+# No repeats for visit/virus
+titres_2015 %>% check_no_duplicates(id, visit, virus)
+
 # 2017 Onwards ----------------------------------------------------------------
 
 # Survey
@@ -360,6 +362,10 @@ titres_2018 <- serology_2018 %>%
 titres_2017 %>% filter(!id %in% subjects_2017_plus$id)
 titres_2018 %>% filter(!id %in% subjects_2017_plus$id)
 
+# No repeats for visit/virus
+titres_2017 %>% check_no_duplicates(id, visit, virus)
+titres_2018 %>% check_no_duplicates(id, visit, virus)
+
 # Combine ---------------------------------------------------------------------
 
 # Combine all participants
@@ -376,6 +382,12 @@ titres %>% filter(!id %in% subjects$id)
 
 # No duplicate ids in the subject table withing each year
 subjects %>% check_no_duplicates(id, study_year)
+
+# No duplicates for year, visit virus
+titres %>% check_no_duplicates(id, study_year, visit, virus)
+
+# Temporary fix, I really need there to be no duplicates
+titres_temp_fix <- titres %>% keep_first_row(id, study_year, visit, virus)
 
 # Check that there is no inconsistent virus naming between years
 viruses_2015 <- extract_virus_names(titres, 2015)
@@ -394,4 +406,4 @@ setdiff(viruses_2018, viruses_2018)
 # Save
 
 save_data(subjects, "subject")
-save_data(titres, "titre")
+save_data(titres_temp_fix, "titre")

@@ -27,6 +27,8 @@ Case 100 (37, 35)
 
 - ID R1105S is present in serology but not in the survey
 
+- ID R1906W has 2 entries for visit 3
+
 # Serology 2017
 
 - Cases 19 and 20 repeat (i.e. it goes ..., 17, 18, 19, 20, 19, 20, 21, ...)
@@ -61,6 +63,8 @@ Case 228 (34, 35)
 - A number of cases are under 18 (as low as 1)
   in 2017 and only in 2017. Don't know if this
   is how it's meant to be.
+
+- ID K112H5 has 2 entries for visit 1
 
 # Serology 2018
 
