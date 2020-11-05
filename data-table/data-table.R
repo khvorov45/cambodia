@@ -15,7 +15,7 @@ format_percent <- function(d) {
 }
 
 summarise_numeric <- function(nums) {
-  glue::glue("{format_decimal(mean(nums))} ± {format_decimal(sd(nums))}")
+  glue::glue("{format_decimal(mean(nums))} ({format_decimal(sd(nums))})")
 }
 
 summarise_factor <- function(fac) {
