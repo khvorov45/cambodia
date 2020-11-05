@@ -192,17 +192,8 @@ serology_2015 <- read_raw(
 # Check that ids and cases correspond
 serology_2015 %>% check_unique(case, id)
 
-# Check that age doesn't change by more than a year
-serology_2015 %>% check_range(case, age_years)
-
-# Check that age ascends with visit
-serology_2015 %>% check_ascending(case, visit, age_years)
-
-# Check that gender doesn't change
-serology_2015 %>% check_unique(case, gender)
-
-# Check that gender is either F or M
-unique(serology_2015$gender)
+# Check visit
+unique(serology_2015$visit)
 
 # Titres
 titres_2015 <- serology_2015 %>%
@@ -292,18 +283,6 @@ serology_2017 <- read_serology_2017_plus("2017-2018_Results S1-S4", "A4:S756")
 # Check that case and id correspond
 serology_2017 %>% check_unique(case, id)
 
-# Check that age doesn't change by more than a year
-serology_2017 %>% check_range(case, age_years)
-
-# Check that age ascends with visit
-serology_2017 %>% check_ascending(case, visit, age_years)
-
-# Check that gender doesn't change
-serology_2017 %>% check_unique(case, gender)
-
-# Check that gender is either F or M
-unique(serology_2017$gender)
-
 # Check visit
 unique(serology_2017$visit)
 
@@ -321,18 +300,6 @@ serology_2018 <- read_serology_2017_plus(
 
 # Check that case and id correspond
 serology_2018 %>% check_unique(case, id)
-
-# Check that age doesn't change by more than a year
-serology_2018 %>% check_range(case, age_years)
-
-# Check that age ascends with visit
-serology_2018 %>% check_ascending(case, visit, age_years)
-
-# Check that gender doesn't change
-serology_2018 %>% check_unique(case, gender)
-
-# Check that gender is either F or M
-unique(serology_2018$gender)
 
 # Check visit
 unique(serology_2018$visit)
