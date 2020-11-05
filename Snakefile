@@ -28,6 +28,7 @@ rule data_plot:
     output:
         "data-plot/age-hist.pdf",
         "data-plot/titre.pdf",
+        "data-plot/titre-multiple-years.pdf",
     shell:
         "Rscript data-plot/data-plot.R"
 
