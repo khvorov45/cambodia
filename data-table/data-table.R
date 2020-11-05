@@ -40,6 +40,18 @@ summarise_binary <- function(bin_vec) {
   )
 }
 
+summarise_logmean <- function(titres) {
+  logtitres <- log(titres)
+  logmn <- mean(logtitres)
+  logse <- sd(logtitres) / sqrt(length(titres))
+  q <- qnorm(0.975)
+  glue::glue(
+    "{format_decimal(exp(logmn))} ",
+    "({format_decimal(exp(logmn - q * logse))}, ",
+    "{format_decimal(exp(logmn + q * logse))})",
+  )
+}
+
 save_data <- function(data, name) {
   write_csv(data, glue::glue("data-table/{name}.csv"))
   data
@@ -63,26 +75,53 @@ subject %>%
 
 titre <- read_data("titre")
 
-summarise_gmt <- function(titres) {
-  logtitres <- log(titres)
-  logmn <- mean(logtitres)
-  logse <- sd(logtitres) / sqrt(length(titres))
-  q <- qnorm(0.975)
-  glue::glue(
-    "{format_decimal(exp(logmn))} ",
-    "({format_decimal(exp(logmn - q * logse))}, ",
-    "{format_decimal(exp(logmn + q * logse))})",
-  )
+# Summaries that involve 2 timepoints
+timepoint_combos <- tibble(
+  t1_lbl = unique(titre$visit),
+  t2_lbl = unique(titre$visit)
+) %>%
+  expand.grid() %>%
+  as_tibble() %>%
+  filter(t2_lbl > t1_lbl)
+
+summary_one_timepoint_combo <- function(t1_lbl, t2_lbl, data) {
+  data_mod <- data %>%
+    filter(visit %in% c(t1_lbl, t2_lbl)) %>%
+    pivot_wider(names_from = "visit", values_from = titre) %>%
+    mutate(
+      t1 = !!rlang::sym(as.character(t1_lbl)),
+      t2 = !!rlang::sym(as.character(t2_lbl)),
+      logt1 = log(t1),
+      logt2 = log(t2),
+      logdiff = logt1 - logt2,
+      ratio = t2 / t1,
+    ) %>%
+    filter(!is.na(t1), !is.na(t2))
+  fit <- lm(logt2 ~ logt1, data_mod)
+  b1 <- fit$coef[["logt1"]]
+  reference <- log(10)
+  data_mod %>%
+    mutate(
+      logt2_corrected = logt2 - b1 * (logt1 - reference),
+      t2_corrected = exp(logt2_corrected),
+      ratio_corrected = t2_corrected / 10,
+    ) %>%
+    group_by(study_year, virus, clade) %>%
+    summarise(
+      n_individuals = length(unique(id)),
+      baseline = summarise_logmean(t1),
+      gmt = summarise_logmean(t2),
+      gmr = summarise_logmean(ratio),
+      gmt_corrected = summarise_logmean(t2_corrected),
+      gmr_corrected = summarise_logmean(ratio_corrected),
+      titre_above_40 = summarise_binary(t2 >= 40),
+      titre_above_40_below_before = summarise_binary(t2[t1 < 40] >= 40),
+      seroconv = summarise_binary(if_else(t1 == 5, t2 >= 40, ratio >= 4)),
+      timepoints = glue::glue("{t2_lbl} vs {t1_lbl}"),
+      .groups = "drop"
+    )
 }
 
-# Summaries that only involve one timepoint
-
-titre %>%
-  group_by(study_year, virus, clade, visit) %>%
-  summarise(
-    n_individuals = length(unique(id)),
-    gmt = summarise_gmt(titre),
-    titre_above_40 = summarise_binary(titre >= 40),
-    .groups = "drop"
-  ) %>%
-  save_data("titre-one-timepoint")
+pmap_dfr(timepoint_combos, summary_one_timepoint_combo, titre) %>%
+  select(study_year, timepoints, everything()) %>%
+  save_data("titre")
