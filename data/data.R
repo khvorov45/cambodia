@@ -308,7 +308,7 @@ titres %>% filter(!complete.cases(.))
 # All titres should correspond to a subject
 titres %>% filter(!id %in% subjects$id)
 
-# No duplicate ids in the subject table withing each year
+# No duplicate ids in the subject table within each year
 subjects %>% check_no_duplicates(id, study_year)
 
 # No duplicates for year, visit virus
