@@ -1,0 +1,6 @@
+Animal processing (heads and kgs). The individual counts for kg can be
+smaller than those for heads because some individuals only responded to head and
+not to kg
+
+Format:
+Mean from - mean to [total number (of individuals who process any)]

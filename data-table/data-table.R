@@ -148,3 +148,28 @@ animal_possession %>%
     names_from = "study_year", values_from = "summary", values_fill = ""
   ) %>%
   save_data("animal-possession")
+
+# Animal processing
+animal_process <- read_data("animal-process")
+
+head_ids <- animal_process %>%
+  filter(type == "head") %>%
+  pull(id)
+kg_ids <- animal_process %>%
+  filter(type == "kg") %>%
+  pull(id)
+
+setdiff(head_ids, kg_ids)
+setdiff(kg_ids, head_ids)
+# All heads seem to be in kilograms
+
+animal_process %>%
+  group_by(study_year, animal, type) %>%
+  summarise(
+    summary = glue::glue(
+      "{round(mean(from), 0)} - {round(mean(to), 0)} [{n()}]"
+    ),
+    .groups = "drop"
+  ) %>%
+  pivot_wider(names_from = "type", values_from = "summary") %>%
+  save_data("animal-process")

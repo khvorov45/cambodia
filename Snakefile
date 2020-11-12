@@ -39,11 +39,15 @@ rule data_table:
         ".deps-installed",
         "data-table/data-table.R",
         "data/subject.csv",
+        "data/titre.csv",
+        "data/animal-possession.csv",
+        "data/animal-process.csv",
         "data/read_data.R",
     output:
         "data-table/subject.csv",
         "data-table/titre.csv",
         "data-table/animal-possession.csv",
+        "data-table/animal-process.csv",
     shell:
         "Rscript data-table/data-table.R"
 
