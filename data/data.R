@@ -165,36 +165,22 @@ subjects_2015 %>% filter(!complete.cases(.))
 
 serology_2015 <- read_raw(
   "serology",
-  sheet = "2015_Result S1-S4", range = "A4:P510"
+  sheet = "2015_Result S1-S4", range = "A4:P509"
 ) %>%
   select(
-    case = Case,
     id_visit = `ID Code`,
-    age_years = Age,
-    gender = Gender,
     visit = `Serum Visit`,
     contains("A/"),
     contains("B/")
   ) %>%
-  # Case is a meged cell, only the first entry contains the value, the others
-  # are NA, so fill the NA's
-  fill(case) %>%
   mutate(
-    case = as.character(case),
     # Create an individual id
     id = str_replace(id_visit, "V\\d$", ""),
     # Make visit numeric, warning will be generated if non-numbers are left
     visit = str_replace(visit, "^V", "") %>% as.integer(),
-    # Fix age
-    age_years = str_replace(age_years, "54/53", "54") %>% as.integer(),
-    # Fix gender
-    gender = str_replace(gender, "F\\?", "F"),
     # Convert titres to character to be fixed later
     across(c(contains("A/"), contains("B/")), as.character)
   )
-
-# Check that ids and cases correspond
-serology_2015 %>% check_unique(case, id)
 
 # Check visit
 unique(serology_2015$visit)
@@ -209,9 +195,6 @@ titres_2015 %>% filter(!id %in% subjects_2015$id)
 
 # Check that there is no missing data
 titres_2015 %>% filter(!complete.cases(.))
-
-# All ids should be in subjects
-titres_2015 %>% filter(!id %in% subjects_2015$id)
 
 # No repeats for visit/virus
 titres_2015 %>% check_no_duplicates(id, visit, virus)
