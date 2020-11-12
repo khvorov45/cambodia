@@ -6,3 +6,5 @@
 .snakemake
 *.zip
 manuscript
+*.dta
+*.docx
