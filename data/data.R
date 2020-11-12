@@ -233,6 +233,8 @@ summary(subjects_2017_plus$age_years)
 # Check that ids don't repeat within a year
 subjects_2017_plus %>% check_no_duplicates(id, study_year)
 
+# Serology
+
 read_serology_2017_plus <- function(sheet, range) {
   read_raw(
     "serology",
