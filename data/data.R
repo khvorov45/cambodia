@@ -161,6 +161,8 @@ subjects_2015$age_years %>% summary()
 # Should be no missing data
 subjects_2015 %>% filter(!complete.cases(.))
 
+# Serology
+
 serology_2015 <- read_raw(
   "serology",
   sheet = "2015_Result S1-S4", range = "A4:P510"
