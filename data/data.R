@@ -389,6 +389,7 @@ animal_process <- animal_process_2017_plus
 animal_process %>% check_no_duplicates(id, study_year, animal, type)
 animal_process %>% filter(to < from)
 animal_process %>% filter(!id %in% subjects$id)
+animal_process %>% filter(!complete.cases(.))
 
 # Save
 
