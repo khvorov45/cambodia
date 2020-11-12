@@ -210,6 +210,7 @@ responses_2017_plus <- read_raw("responses-2017", "dta") %>%
     gender = n12gender,
     date_interview = n1intervie,
     contains("n18"),
+    contains("n22")
   ) %>%
   mutate(
     # Remove visit indicator from id
@@ -256,6 +257,28 @@ animals_other_2017_plus <- responses_2017_plus %>%
   filter(!is.na(count), !animal %in% c("", "0"), count > 0)
 
 animals_other_2017_plus %>% check_no_duplicates(id, animal, study_year)
+
+# Animal processing
+animal_process_2017_plus <- responses_2017_plus %>%
+  select(id, study_year, contains("n22")) %>%
+  pivot_longer(contains("n22"), names_to = "code_og", values_to = "number") %>%
+  filter(!is.na(number)) %>%
+  mutate(
+    animal = case_when(
+      str_starts(code_og, "n22[a|b]") ~ "chicken",
+      str_starts(code_og, "n22[c|d]") ~ "duck",
+      str_starts(code_og, "n22[e|f]") ~ "pig",
+    ),
+    type = if_else(str_starts(code_og, "n22[a|c|e]"), "head", "kg"),
+    bound = if_else(str_length(code_og) == 4, "to", "from"),
+  ) %>%
+  select(-code_og) %>%
+  pivot_wider(names_from = "bound", values_from = "number") %>%
+  filter(to > 0)
+
+animal_process_2017_plus %>% check_no_duplicates(id, study_year, animal, type)
+animal_process_2017_plus %>% filter(to < from)
+animal_process_2017_plus %>% filter(!id %in% subjects_2017_plus$id)
 
 # Serology
 
@@ -361,8 +384,15 @@ animal_possession <- bind_rows(
 animal_possession %>% check_no_duplicates(id, animal, study_year)
 animal_possession %>% filter(!id %in% subjects_2017_plus$id)
 
+animal_process <- animal_process_2017_plus
+
+animal_process %>% check_no_duplicates(id, study_year, animal, type)
+animal_process %>% filter(to < from)
+animal_process %>% filter(!id %in% subjects$id)
+
 # Save
 
 save_data(subjects, "subject")
 save_data(titres, "titre")
 save_data(animal_possession, "animal-possession")
+save_data(animal_process, "animal-process")

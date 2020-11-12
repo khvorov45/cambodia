@@ -17,6 +17,7 @@ rule data:
         "data/subject.csv",
         "data/titre.csv",
         "data/animal-possession.csv",
+        "data/animal-process.csv",
     shell:
         "Rscript data/data.R"
 
