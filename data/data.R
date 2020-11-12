@@ -241,15 +241,10 @@ read_serology_2017_plus <- function(sheet, range) {
     sheet = sheet, range = range
   ) %>%
     select(
-      case = Case,
       id_sample = `Sample Code_V1`,
-      age_years = Age,
-      gender = Gender,
       contains("A/"),
       contains("B/")
     ) %>%
-    # Meged cells - fill NA's
-    fill(case) %>%
     mutate(
       # Extract visit from id
       id = str_replace(id_sample, "^\\d", "") %>%
@@ -262,9 +257,6 @@ read_serology_2017_plus <- function(sheet, range) {
 }
 
 serology_2017 <- read_serology_2017_plus("2017-2018_Results S1-S4", "A4:S756")
-
-# Check that case and id correspond
-serology_2017 %>% check_unique(case, id)
 
 # Check visit
 unique(serology_2017$visit)
@@ -281,22 +273,8 @@ serology_2018 <- read_serology_2017_plus(
     visit = (visit - 1) %% 4 + 1,
   )
 
-# Check that case and id correspond
-serology_2018 %>% check_unique(case, id)
-
 # Check visit
 unique(serology_2018$visit)
-
-# Everyone with visit 5 is supposed to be in 2017 data
-serology_2018 %>%
-  group_by(case) %>%
-  filter(
-    any(visit_og > 4),
-    !id %in% filter(subjects_2017_plus, study_year == 2017)$id,
-    id_sample == first(id_sample)
-  ) %>%
-  pull(id_sample) %>%
-  unique()
 
 # Extract 2017+ titres
 
