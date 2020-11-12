@@ -106,3 +106,18 @@ save_plot(
   titre_plot_multiple_years, "titre-multiple-years",
   width = 50, height = 10
 )
+
+# Animal posession
+
+animal_possession <- read_data("animal-possession")
+
+animal_possession_plot <- animal_possession %>%
+  ggplot(aes(animal, count)) +
+  common_theme +
+  scale_y_log10("Count", breaks = c(10^(0:5), 5000)) +
+  scale_x_discrete("Animal", labels = as_labeller(tools::toTitleCase)) +
+  facet_wrap(~study_year) +
+  geom_jitter(height = 0, width = 0.2, alpha = 0.5, shape = 16) +
+  geom_boxplot(fill = NA, col = "darkblue", outlier.alpha = 0)
+
+save_plot(animal_possession_plot, "animal-possession", width = 10, height = 7)

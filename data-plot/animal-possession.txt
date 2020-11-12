@@ -1,0 +1,3 @@
+Boxplots of the counts of animals that people reported to have.
+Points represent individual observations.
+Y-axis is on a multiplicative scale.

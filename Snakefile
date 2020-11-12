@@ -26,11 +26,14 @@ rule data_plot:
         ".deps-installed",
         "data-plot/data-plot.R",
         "data/subject.csv",
+        "data/titre.csv",
+        "data/animal-possession.csv",
         "data/read_data.R",
     output:
         "data-plot/age-hist.pdf",
         "data-plot/titre.pdf",
         "data-plot/titre-multiple-years.pdf",
+        "data-plot/animal-possession.pdf",
     shell:
         "Rscript data-plot/data-plot.R"
 
