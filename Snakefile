@@ -10,8 +10,8 @@ rule data:
     input:
         ".deps-installed",
         "data/data.R",
-        "data-raw/responses-2015.csv",
-        "data-raw/responses-2017.csv",
+        "data-raw/responses-2015.dta",
+        "data-raw/responses-2017.dta",
         "data-raw/serology.xlsx",
     output:
         "data/subject.csv",
