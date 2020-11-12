@@ -9,6 +9,9 @@ read_raw <- function(name, ext = "xlsx", ...) {
   if (ext == "xlsx") {
     return(readxl::read_excel(path, ...))
   }
+  if (ext == "dta") {
+    return(haven::read_dta(path, ...))
+  }
   read_csv(path, ...)
 }
 
