@@ -314,9 +314,6 @@ subjects %>% check_no_duplicates(id, study_year)
 # No duplicates for year, visit virus
 titres %>% check_no_duplicates(id, study_year, visit, virus)
 
-# Temporary fix, I really need there to be no duplicates
-titres_temp_fix <- titres %>% keep_first_row(id, study_year, visit, virus)
-
 # Check that there is no inconsistent virus naming between years
 viruses_2015 <- extract_virus_names(titres, 2015)
 viruses_2017 <- extract_virus_names(titres, 2017)
