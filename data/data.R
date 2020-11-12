@@ -203,10 +203,7 @@ titres_2015 %>% check_no_duplicates(id, visit, virus)
 
 # Survey
 
-responses_2017_plus <- read_raw(
-  "responses-2017", "csv",
-  col_types = cols()
-) %>%
+responses_2017_plus <- read_raw("responses-2017", "dta") %>%
   select(
     id = idcode,
     age_years = n10ageyear,
@@ -217,10 +214,7 @@ responses_2017_plus <- read_raw(
     # Remove visit indicator from id
     id_og = id,
     id = str_replace(id, "^\\d+", ""),
-    gender_og = gender,
-    gender = recode(gender, "1" = "M", "2" = "F"),
-    date_interview_og = date_interview,
-    date_interview = parse_date(date_interview, "%d%b%Y"),
+    gender = as_factor(gender, levels = "labels"),
   )
 
 subjects_2017_plus <- responses_2017_plus %>%
