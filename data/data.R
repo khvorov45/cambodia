@@ -209,16 +209,17 @@ responses_2017_plus <- read_raw("responses-2017", "dta") %>%
     age_years = n10ageyear,
     gender = n12gender,
     date_interview = n1intervie,
+    contains("n18"),
   ) %>%
   mutate(
     # Remove visit indicator from id
     id_og = id,
     id = str_replace(id, "^\\d+", ""),
     gender = as_factor(gender, levels = "labels"),
+    study_year = lubridate::year(date_interview),
   )
 
 subjects_2017_plus <- responses_2017_plus %>%
-  mutate(study_year = lubridate::year(date_interview)) %>%
   select(id, age_years, gender, study_year)
 
 # Should be no missing data
@@ -232,6 +233,29 @@ summary(subjects_2017_plus$age_years)
 
 # Check that ids don't repeat within a year
 subjects_2017_plus %>% check_no_duplicates(id, study_year)
+
+# Animal posession
+
+animals_preset_2017_plus <- responses_2017_plus %>%
+  select(id, study_year, contains("n18")) %>%
+  select(-contains("other")) %>%
+  pivot_longer(contains("n18"), names_to = "animal", "values_to" = "count") %>%
+  filter(!is.na(count), count > 0) %>%
+  mutate(
+    animal = animal %>%
+      str_replace("^n18\\w", "") %>%
+      recode("chicke" = "chicken", "buffal" = "buffalo")
+  )
+
+animals_preset_2017_plus %>% check_no_duplicates(id, animal, study_year)
+
+animals_other_2017_plus <- responses_2017_plus %>%
+  select(id, study_year, contains("n18")) %>%
+  select(id, study_year, contains("other")) %>%
+  rename(animal = n18fother, count = n18faother) %>%
+  filter(!is.na(count), !animal %in% c("", "0"), count > 0)
+
+animals_other_2017_plus %>% check_no_duplicates(id, animal, study_year)
 
 # Serology
 
@@ -328,7 +352,17 @@ setdiff(viruses_2018, viruses_2015)
 setdiff(viruses_2017, viruses_2018)
 setdiff(viruses_2018, viruses_2018)
 
+# Survey-derived info
+
+animal_possession <- bind_rows(
+  animals_preset_2017_plus, animals_other_2017_plus
+)
+
+animal_possession %>% check_no_duplicates(id, animal, study_year)
+animal_possession %>% filter(!id %in% subjects_2017_plus$id)
+
 # Save
 
 save_data(subjects, "subject")
 save_data(titres, "titre")
+save_data(animal_possession, "animal-possession")
