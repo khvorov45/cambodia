@@ -133,15 +133,14 @@ extract_virus_names <- function(data, year) {
 
 # Survey
 
-responses_2015 <- read_raw("responses-2015", "csv", col_types = cols()) %>%
+responses_2015 <- read_raw("responses-2015", "dta") %>%
   select(
     id = idcode2015,
     gender = n12gender,
     age_years = n10ageyear,
   ) %>%
   mutate(
-    gender_og = gender,
-    gender = recode(gender, "1" = "M", "2" = "F"),
+    gender = as_factor(gender, levels = "labels"),
   )
 
 # Extract subjects
