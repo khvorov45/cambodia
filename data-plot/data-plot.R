@@ -38,6 +38,7 @@ titre_plot <- function(data, min_y = NULL, max_y = NULL) {
     theme(
       strip.background = element_blank(),
       panel.grid.minor = element_blank(),
+      panel.spacing = unit(0, "null"),
       legend.position = "none"
     ) +
     coord_cartesian(ylim = c(min_y, max_y)) +
