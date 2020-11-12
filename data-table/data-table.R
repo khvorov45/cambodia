@@ -32,8 +32,9 @@ summarise_binary <- function(bin_vec) {
   success <- sum(bin_vec)
   failure <- total - success
   point <- success / total
-  low <- min(qbeta(0.025, success + 1, failure + 1), point)
-  high <- max(qbeta(0.975, success + 1, failure + 1), point)
+  ci <- PropCIs::exactci(success, total, 0.95)$conf.int
+  low <- ci[[1]]
+  high <- ci[[2]]
   glue::glue(
     "{success} / {total} ",
     "{format_percent(point)} ({format_percent(low)}, {format_percent(high)})"

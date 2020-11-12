@@ -2,7 +2,7 @@ Summaries for each timepoint pair for each year for each virus.
 
 Format:
 mean (95% CI)
-success / total percentage (95% CI - beta approximation)
+success / total percentage (95% CI - Clopper-Pearson exact interval)
 
 GMT/GMR correction was done like this:
 
