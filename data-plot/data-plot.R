@@ -54,7 +54,7 @@ facet_year_virus <- function(plot) {
     facet_grid(study_year ~ virus_lbl, labeller = as_labeller(wrap_virus_names))
 }
 
-arrange <- function(...) {
+arrange_plots <- function(...) {
   ggdark::lighten_geoms()
   arr <- ggpubr::ggarrange(...)
   ggdark::darken_geoms()
@@ -88,7 +88,7 @@ titre_plots <- titre %>%
   map(titre_plot, min(titre$titre), max(titre$titre)) %>%
   map(facet_year_virus)
 
-titre_plots_arranged <- arrange(plotlist = titre_plots, ncol = 1)
+titre_plots_arranged <- arrange_plots(plotlist = titre_plots, ncol = 1)
 
 save_plot(titre_plots_arranged, "titre", width = 50, height = 25)
 
