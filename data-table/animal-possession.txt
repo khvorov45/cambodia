@@ -1,0 +1,5 @@
+Summary of counts of animals for each year. If an animals doesn't appear here
+then nobody had any of it in any year.
+
+Format:
+Median [Quartile 1, Quartile 3] Number of individuals (who had any animals of that type that year)

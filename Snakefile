@@ -42,6 +42,7 @@ rule data_table:
     output:
         "data-table/subject.csv",
         "data-table/titre.csv",
+        "data-table/animal-possession.csv",
     shell:
         "Rscript data-table/data-table.R"
 

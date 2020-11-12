@@ -53,6 +53,13 @@ summarise_logmean <- function(titres) {
   )
 }
 
+summarise_count <- function(count) {
+  glue::glue(
+    "{median(count)} [{quantile(count, 0.25)}, {quantile(count, 0.75)}] ",
+    "{length(count)}"
+  )
+}
+
 save_data <- function(data, name) {
   write_csv(data, glue::glue("data-table/{name}.csv"))
   data
@@ -126,3 +133,18 @@ summary_one_timepoint_combo <- function(t1_lbl, t2_lbl, data) {
 pmap_dfr(timepoint_combos, summary_one_timepoint_combo, titre) %>%
   select(study_year, timepoints, everything()) %>%
   save_data("titre")
+
+# Animal possession
+
+animal_possession <- read_data("animal-possession")
+
+animal_possession %>%
+  group_by(study_year, animal) %>%
+  summarise(
+    summary = summarise_count(count),
+    .groups = "drop",
+  ) %>%
+  pivot_wider(
+    names_from = "study_year", values_from = "summary", values_fill = ""
+  ) %>%
+  save_data("animal-possession")
