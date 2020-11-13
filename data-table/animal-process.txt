@@ -3,4 +3,5 @@ smaller than those for heads because some individuals only responded to head and
 not to kg
 
 Format:
-Mean from - mean to [total number (of individuals who process any)]
+Midpoint = (from + to) / 2
+Median of midpoints [IQR of midpoints] total number (of individuals who process any)

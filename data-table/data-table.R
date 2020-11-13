@@ -15,10 +15,12 @@ format_percent <- function(d) {
 }
 
 summarise_numeric <- function(nums) {
+  nums <- na.omit(nums)
   glue::glue("{format_decimal(mean(nums))} ({format_decimal(sd(nums))})")
 }
 
 summarise_factor <- function(fac) {
+  fac <- na.omit(fac)
   n <- length(fac)
   one_level <- function(lvl) {
     n_level <- sum(fac == lvl)
@@ -28,6 +30,7 @@ summarise_factor <- function(fac) {
 }
 
 summarise_binary <- function(bin_vec) {
+  bin_vec <- na.omit(bin_vec)
   total <- length(bin_vec)
   success <- sum(bin_vec)
   failure <- total - success
@@ -42,6 +45,7 @@ summarise_binary <- function(bin_vec) {
 }
 
 summarise_logmean <- function(titres) {
+  titres <- na.omit(titres)
   logtitres <- log(titres)
   logmn <- mean(logtitres)
   logse <- sd(logtitres) / sqrt(length(titres))
@@ -54,6 +58,7 @@ summarise_logmean <- function(titres) {
 }
 
 summarise_count <- function(count) {
+  count <- na.omit(count)
   glue::glue(
     "{median(count)} [{quantile(count, 0.25)}, {quantile(count, 0.75)}] ",
     "{length(count)}"
@@ -165,10 +170,9 @@ setdiff(kg_ids, head_ids)
 
 animal_process %>%
   group_by(study_year, animal, type) %>%
+  mutate(mid = map2_dbl(to, from, ~ mean(c(.x, .y)))) %>%
   summarise(
-    summary = glue::glue(
-      "{round(mean(from), 0)} - {round(mean(to), 0)} [{n()}]"
-    ),
+    summary = summarise_count(mid),
     .groups = "drop"
   ) %>%
   pivot_wider(names_from = "type", values_from = "summary") %>%
