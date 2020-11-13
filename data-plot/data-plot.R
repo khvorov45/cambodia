@@ -142,7 +142,7 @@ animal_process_plot <- animal_process %>%
     type ~ study_year,
     switch = "y", labeller = as_labeller(tools::toTitleCase)
   ) +
-  geom_errorbar(width = 0.1, alpha = 0.2, ) +
+  geom_errorbar(width = 0.1, alpha = 0.2) +
   geom_boxplot(aes(y = mid), fill = NA, outlier.alpha = 0, col = "darkblue")
 
 save_plot(animal_process_plot, "animal-process", width = 12, height = 12)
