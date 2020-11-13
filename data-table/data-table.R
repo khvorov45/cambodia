@@ -170,7 +170,6 @@ setdiff(kg_ids, head_ids)
 
 animal_process %>%
   group_by(study_year, animal, type) %>%
-  mutate(mid = map2_dbl(to, from, ~ mean(c(.x, .y)))) %>%
   summarise(
     summary = summarise_count(mid),
     .groups = "drop"

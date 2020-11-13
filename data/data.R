@@ -384,7 +384,8 @@ animal_possession <- bind_rows(
 animal_possession %>% check_no_duplicates(id, animal, study_year)
 animal_possession %>% filter(!id %in% subjects_2017_plus$id)
 
-animal_process <- animal_process_2017_plus
+animal_process <- animal_process_2017_plus %>%
+  mutate(mid = map2_dbl(from, to, ~ mean(c(.x, .y))))
 
 animal_process %>% check_no_duplicates(id, study_year, animal, type)
 animal_process %>% filter(to < from)
