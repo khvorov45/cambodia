@@ -121,3 +121,28 @@ animal_possession_plot <- animal_possession %>%
   geom_boxplot(fill = NA, col = "darkblue", outlier.alpha = 0)
 
 save_plot(animal_possession_plot, "animal-possession", width = 10, height = 7)
+
+# Animal processsing
+
+animal_process <- read_data("animal-process")
+
+animal_process_plot <- animal_process %>%
+  mutate(from = if_else(from == 0, 0.1, from)) %>%
+  ggplot(aes(animal, mid, ymin = from, ymax = to)) +
+  common_theme +
+  theme(
+    axis.title.y = element_blank(),
+    strip.placement = "outside"
+  ) +
+  scale_y_log10(
+    breaks = c(0.1, 10^(0:4), 40000), labels = c(0, 10^(0:4), 40000)
+  ) +
+  scale_x_discrete("Animal", labels = as_labeller(tools::toTitleCase)) +
+  facet_grid(
+    type ~ study_year,
+    switch = "y", labeller = as_labeller(tools::toTitleCase)
+  ) +
+  geom_errorbar(width = 0.1, alpha = 0.2, ) +
+  geom_boxplot(aes(y = mid), fill = NA, outlier.alpha = 0, col = "darkblue")
+
+save_plot(animal_process_plot, "animal-process", width = 12, height = 12)

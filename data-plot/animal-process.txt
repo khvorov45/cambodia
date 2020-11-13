@@ -1,0 +1,8 @@
+Boxplots of midpoints of animal processing responses. Also plotted are
+to-from ranges for each response.
+
+The Y-axis is on a multiplicative scale.
+The original values of 0 were changed to 0.1 for plotting purposes
+(still labelled as 0)
+
+Midpoint = (to + form) / 2

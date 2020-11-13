@@ -28,12 +28,14 @@ rule data_plot:
         "data/subject.csv",
         "data/titre.csv",
         "data/animal-possession.csv",
+        "data/animal-process.csv",
         "data/read_data.R",
     output:
         "data-plot/age-hist.pdf",
         "data-plot/titre.pdf",
         "data-plot/titre-multiple-years.pdf",
         "data-plot/animal-possession.pdf",
+        "data-plot/animal-process.pdf",
     shell:
         "Rscript data-plot/data-plot.R"
 
