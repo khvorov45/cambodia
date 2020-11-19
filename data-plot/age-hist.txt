@@ -1,1 +1,0 @@
-Histograms of participant age by year. Participants were taken from survey responses. The age was taken from the first column that contained it.

@@ -31,7 +31,7 @@ rule data_plot:
         "data/animal-process.csv",
         "data/read_data.R",
     output:
-        "data-plot/age-hist.pdf",
+        "data-plot/age-gender-hist.pdf",
         "data-plot/titre.pdf",
         "data-plot/titre-multiple-years.pdf",
         "data-plot/animal-possession.pdf",

@@ -72,14 +72,22 @@ common_theme <- ggdark::dark_theme_bw(verbose = FALSE) +
   )
 
 age_hist <- subject %>%
-  ggplot(aes(age_years)) +
+  ggplot(aes(age_years, fill = gender)) +
   common_theme +
+  theme(
+    legend.position = "bottom",
+    legend.box.spacing = unit(0, "null")
+  ) +
   scale_y_continuous("Count", breaks = 1:100, expand = expansion(c(0, 0.1))) +
   scale_x_continuous("Age") +
-  facet_wrap(~study_year) +
+  scale_fill_brewer("Gender", type = "qual") +
+  facet_wrap(~study_year, ncol = 1) +
   geom_histogram(binwidth = 1)
 
-save_plot(age_hist, "age-hist", width = 15, height = 7)
+save_plot(
+  age_hist, "age-gender-hist",
+  width = 15, height = 5 * length(unique(subject$study_year))
+)
 
 titre <- read_data("titre")
 
