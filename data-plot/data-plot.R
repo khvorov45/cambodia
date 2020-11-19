@@ -120,7 +120,10 @@ animal_possession_plot <- animal_possession %>%
   geom_jitter(height = 0, width = 0.2, alpha = 0.5, shape = 16) +
   geom_boxplot(fill = NA, col = "darkblue", outlier.alpha = 0)
 
-save_plot(animal_possession_plot, "animal-possession", width = 10, height = 7)
+save_plot(
+  animal_possession_plot, "animal-possession",
+  width = 5 * length(unique(animal_possession$animal)), height = 7
+)
 
 # Animal processsing
 

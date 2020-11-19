@@ -138,6 +138,8 @@ responses_2015 <- read_raw("responses-2015", "dta") %>%
     id = idcode2015,
     gender = n12gender,
     age_years = n10ageyear,
+    contains("n42"),
+    contains("n43"),
   ) %>%
   mutate(
     gender = as_factor(gender, levels = "labels"),
@@ -160,6 +162,28 @@ subjects_2015$age_years %>% summary()
 
 # Should be no missing data
 subjects_2015 %>% filter(!complete.cases(.))
+
+# Animal possession
+
+animals_2015 <- responses_2015 %>%
+  select(id, contains("n42"), contains("n43")) %>%
+  pivot_longer(-id, names_to = "code_og", values_to = "count") %>%
+  mutate(
+    animal = case_when(
+      str_detect(code_og, "n42") ~ "chicken",
+      str_detect(code_og, "n43") ~ "duck"
+    ),
+    bound = if_else(str_length(code_og) == 3, "to", "from")
+  ) %>%
+  select(-code_og) %>%
+  pivot_wider(names_from = "bound", values_from = "count") %>%
+  filter(!is.na(to), !is.na(from), to > 0) %>%
+  mutate(count = round((from + to) / 2)) %>%
+  select(-from, -to) %>%
+  mutate(study_year = 2015)
+
+animals_2015 %>% check_no_duplicates(id, animal)
+animals_2015 %>% filter(!id %in% subjects_2015$id)
 
 # Serology
 
@@ -378,14 +402,14 @@ setdiff(viruses_2018, viruses_2018)
 # Survey-derived info
 
 animal_possession <- bind_rows(
-  animals_preset_2017_plus, animals_other_2017_plus
+  animals_preset_2017_plus, animals_other_2017_plus, animals_2015
 )
 
 animal_possession %>% check_no_duplicates(id, animal, study_year)
-animal_possession %>% filter(!id %in% subjects_2017_plus$id)
+animal_possession %>% filter(!id %in% subjects$id)
 
 animal_process <- animal_process_2017_plus %>%
-  mutate(mid = map2_dbl(from, to, ~ mean(c(.x, .y))))
+  mutate(mid = (from + to) / 2)
 
 animal_process %>% check_no_duplicates(id, study_year, animal, type)
 animal_process %>% filter(to < from)
