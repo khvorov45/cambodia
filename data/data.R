@@ -140,6 +140,10 @@ responses_2015 <- read_raw("responses-2015", "dta") %>%
     age_years = n10ageyear,
     contains("n42"),
     contains("n43"),
+    contains("n32"),
+    contains("n33"),
+    contains("n34"),
+    contains("n35"),
   ) %>%
   mutate(
     gender = as_factor(gender, levels = "labels"),
@@ -184,6 +188,32 @@ animals_2015 <- responses_2015 %>%
 
 animals_2015 %>% check_no_duplicates(id, animal)
 animals_2015 %>% filter(!id %in% subjects_2015$id)
+
+# Animal processing
+
+animal_process_2015 <- responses_2015 %>%
+  select(
+    id,
+    contains("n32"),
+    contains("n33"),
+    contains("n34"),
+    contains("n35"),
+  ) %>%
+  pivot_longer(-id, names_to = "code_og", values_to = "number") %>%
+  mutate(
+    animal = if_else(
+      str_detect(code_og, "n3[2|3]"), "chicken", "duck"
+    ),
+    type = if_else(str_detect(code_og, "n3[3|5]"), "kg", "head"),
+    bound = if_else(str_length(code_og) == 3, "to", "from"),
+    study_year = 2015,
+  ) %>%
+  select(-code_og) %>%
+  pivot_wider(names_from = "bound", values_from = "number") %>%
+  filter(!is.na(from), !is.na(to), to > 0)
+
+animal_process_2015 %>% check_no_duplicates(id, animal, type)
+animal_process_2015 %>% filter(!id %in% subjects_2015$id)
 
 # Serology
 
@@ -408,7 +438,7 @@ animal_possession <- bind_rows(
 animal_possession %>% check_no_duplicates(id, animal, study_year)
 animal_possession %>% filter(!id %in% subjects$id)
 
-animal_process <- animal_process_2017_plus %>%
+animal_process <- bind_rows(animal_process_2017_plus, animal_process_2015) %>%
   mutate(mid = (from + to) / 2)
 
 animal_process %>% check_no_duplicates(id, study_year, animal, type)

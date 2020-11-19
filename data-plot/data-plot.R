@@ -148,4 +148,7 @@ animal_process_plot <- animal_process %>%
   geom_errorbar(width = 0.1, alpha = 0.2) +
   geom_boxplot(aes(y = mid), fill = NA, outlier.alpha = 0, col = "darkblue")
 
-save_plot(animal_process_plot, "animal-process", width = 12, height = 12)
+save_plot(
+  animal_process_plot, "animal-process",
+  width = 6 * length(unique(animal_process$animal)), height = 12
+)
