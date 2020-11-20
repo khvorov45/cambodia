@@ -16,6 +16,7 @@ rule data:
     output:
         "data/subject.csv",
         "data/titre.csv",
+        "data/virus.csv",
         "data/animal-possession.csv",
         "data/animal-process.csv",
     shell:

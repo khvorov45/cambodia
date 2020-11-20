@@ -429,6 +429,16 @@ setdiff(viruses_2018, viruses_2015)
 setdiff(viruses_2017, viruses_2018)
 setdiff(viruses_2018, viruses_2018)
 
+# Extract viruses
+viruses <- titre %>%
+  select(virus, clade) %>%
+  distinct()
+
+# Same virus can't be in different clades
+viruses %>%
+  count(virus, clade) %>%
+  filter(n != 1)
+
 # Survey-derived info
 
 animal_possession <- bind_rows(
@@ -452,3 +462,4 @@ save_data(subjects, "subject")
 save_data(titres, "titre")
 save_data(animal_possession, "animal-possession")
 save_data(animal_process, "animal-process")
+save_data(viruses, "virus")
