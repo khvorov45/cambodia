@@ -63,6 +63,8 @@ arrange_plots <- function(...) {
 
 # Script ======================================================================
 
+# Subject characteristics
+
 subject <- read_data("subject")
 common_theme <- ggdark::dark_theme_bw(verbose = FALSE) +
   theme(
@@ -89,8 +91,12 @@ save_plot(
   width = 15, height = 5 * length(unique(subject$study_year))
 )
 
-titre <- read_data("titre")
+# Serology
 
+titre <- read_data("titre")
+virus <- read_data("virus")
+
+# All titre data
 titre_plots <- titre %>%
   group_split(study_year) %>%
   map(titre_plot, min(titre$titre), max(titre$titre)) %>%
@@ -99,6 +105,45 @@ titre_plots <- titre %>%
 titre_plots_arranged <- arrange_plots(plotlist = titre_plots, ncol = 1)
 
 save_plot(titre_plots_arranged, "titre", width = 50, height = 25)
+
+# Titre summary
+titre_summ <- titre %>%
+  group_by(visit, virus, clade, study_year) %>%
+  summarise(
+    titre = exp(mean(log(titre))),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    visit_lbl = factor(visit),
+  ) %>%
+  ggplot(aes(virus, titre, col = visit_lbl, fill = visit_lbl)) +
+  ggdark::dark_theme_bw(verbose = FALSE) +
+  common_theme +
+  theme(
+    axis.text.x = element_text(angle = 55, hjust = 1),
+    plot.margin = margin(1, 1, 1, 1, unit = "cm"),
+    legend.position = "bottom",
+  ) +
+  scale_x_discrete("Virus") +
+  scale_y_log10("Average titre") +
+  scale_fill_brewer("Visit", type = "qual") +
+  scale_color_brewer("Visit", type = "qual") +
+  scale_linetype_discrete("Visit") +
+  scale_shape_discrete("Visit") +
+  guides(fill = guide_legend(override.aes = list(alpha = 0.5))) +
+  facet_wrap(~study_year, ncol = 1) +
+  geom_ribbon(aes(ymin = 5, ymax = titre, group = visit)) +
+  geom_line(aes(group = visit, lty = visit_lbl)) +
+  geom_point(aes(shape = visit_lbl)) +
+  geom_text(
+    aes(y = 5, x = virus, label = clade),
+    angle = 90, hjust = 0,
+    size = 3, col = "gray50",
+    data = virus,
+    inherit.aes = FALSE
+  )
+
+save_plot(titre_summ, "titre-summary", width = 20, height = 25)
 
 # Plots for individuals with multiple years data
 titre_plot_multiple_years <- titre %>%

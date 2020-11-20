@@ -37,6 +37,7 @@ rule data_plot:
         "data-plot/titre-multiple-years.pdf",
         "data-plot/animal-possession.pdf",
         "data-plot/animal-process.pdf",
+        "data-plot/titre-summary.pdf",
     shell:
         "Rscript data-plot/data-plot.R"
 
