@@ -430,7 +430,7 @@ setdiff(viruses_2017, viruses_2018)
 setdiff(viruses_2018, viruses_2018)
 
 # Extract viruses
-viruses <- titre %>%
+viruses <- titres %>%
   select(virus, clade) %>%
   distinct()
 
