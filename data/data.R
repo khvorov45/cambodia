@@ -140,10 +140,16 @@ responses_2015 <- read_raw("responses-2015", "dta") %>%
     age_years = n10ageyear,
     contains("n42"),
     contains("n43"),
+    # How much do you prepare?
     contains("n32"),
     contains("n33"),
     contains("n34"),
     contains("n35"),
+    # How much do you sell?
+    contains("n49"),
+    contains("n50"),
+    contains("n51"),
+    contains("n52"),
   ) %>%
   mutate(
     gender = as_factor(gender, levels = "labels"),
@@ -191,7 +197,7 @@ animals_2015 %>% filter(!id %in% subjects_2015$id)
 
 # Animal processing
 
-animal_process_2015 <- responses_2015 %>%
+animal_process_2015_prepare <- responses_2015 %>%
   select(
     id,
     contains("n32"),
@@ -212,8 +218,37 @@ animal_process_2015 <- responses_2015 %>%
   pivot_wider(names_from = "bound", values_from = "number") %>%
   filter(!is.na(from), !is.na(to), to > 0)
 
-animal_process_2015 %>% check_no_duplicates(id, animal, type)
-animal_process_2015 %>% filter(!id %in% subjects_2015$id)
+animal_process_2015_prepare %>% check_no_duplicates(id, animal, type)
+animal_process_2015_prepare %>% filter(!id %in% subjects_2015$id)
+
+animal_process_2015_sell <- responses_2015 %>%
+  select(
+    id,
+    contains("n49"),
+    contains("n50"),
+    contains("n51"),
+    contains("n52"),
+  ) %>%
+  pivot_longer(-id, names_to = "code_og", values_to = "number") %>%
+  mutate(
+    animal = if_else(
+      str_detect(code_og, "n5[1|2]"), "duck", "chicken"
+    ),
+    type = if_else(str_detect(code_og, "n5[0|2]"), "kg", "head"),
+    bound = if_else(str_length(code_og) == 3, "to", "from"),
+    study_year = 2015,
+  ) %>%
+  select(-code_og) %>%
+  pivot_wider(names_from = "bound", values_from = "number") %>%
+  filter(!is.na(from), !is.na(to), to > 0)
+
+animal_process_2015_sell %>% check_no_duplicates(id, animal, type)
+animal_process_2015_sell %>% filter(!id %in% subjects_2015$id)
+
+# There seems to be more responses with "sell" rather than "prepare".
+# In the subsequent years these questions seem to have been merged into
+# "how much do you sell/process". So I'm keeping "sell" from 2015 for the
+# animal processing table.
 
 # Serology
 
@@ -448,7 +483,9 @@ animal_possession <- bind_rows(
 animal_possession %>% check_no_duplicates(id, animal, study_year)
 animal_possession %>% filter(!id %in% subjects$id)
 
-animal_process <- bind_rows(animal_process_2017_plus, animal_process_2015) %>%
+animal_process <- bind_rows(
+  animal_process_2017_plus, animal_process_2015_sell
+) %>%
   mutate(mid = (from + to) / 2)
 
 animal_process %>% check_no_duplicates(id, study_year, animal, type)
