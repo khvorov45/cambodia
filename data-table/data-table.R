@@ -119,7 +119,7 @@ summary_one_timepoint_combo <- function(t1_lbl, t2_lbl, data) {
       t2_corrected = exp(logt2_corrected),
       ratio_corrected = t2_corrected / 10,
     ) %>%
-    group_by(study_year, virus, clade) %>%
+    group_by(study_year, virus) %>%
     summarise(
       n_individuals = length(unique(id)),
       baseline = summarise_logmean(t1),
