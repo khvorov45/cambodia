@@ -178,9 +178,9 @@ save_plot(
 
 # Animal processsing
 
-animal_process <- read_data("animal-process")
+animal_sale <- read_data("animal-sale")
 
-animal_process_plot <- animal_process %>%
+animal_sale_plot <- animal_sale %>%
   mutate(from = if_else(from == 0, 0.1, from)) %>%
   ggplot(aes(animal, mid, ymin = from, ymax = to)) +
   common_theme +
@@ -200,6 +200,6 @@ animal_process_plot <- animal_process %>%
   geom_boxplot(aes(y = mid), fill = NA, outlier.alpha = 0, col = "darkblue")
 
 save_plot(
-  animal_process_plot, "animal-process",
-  width = 6 * length(unique(animal_process$animal)), height = 12
+  animal_sale_plot, "animal-sale",
+  width = 6 * length(unique(animal_sale$animal)), height = 12
 )
