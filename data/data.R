@@ -105,7 +105,9 @@ fix_clades <- function(clades) {
   clades %>%
     str_replace("^.*\\s+\\((.*)\\s*$", "(\\1") %>%
     str_replace_all("\\(|\\)", "") %>%
-    str_replace_all("/|_", " ")
+    str_replace_all("/|_", " ") %>%
+    str_replace("B Vic", "BVic") %>%
+    str_replace("B Yam", "BYam")
 }
 
 extract_titres <- function(data) {
@@ -113,9 +115,14 @@ extract_titres <- function(data) {
     select(id, visit, contains("A/"), contains("B/")) %>%
     lengthen_titres() %>%
     mutate(
-      titre = fix_titres(titre),
-      clade = fix_clades(virus),
-      virus = fix_virus_names(virus)
+      titre_og = titre,
+      titre = fix_titres(titre_og),
+      virus_og = virus,
+      virus = fix_virus_names(virus_og),
+      clade_og = fix_clades(virus_og),
+      subtype = str_split(clade_og, " ") %>% map_chr(1),
+      clade = str_split(clade_og, " ") %>%
+        map_chr(~ pluck(.x, 2, .default = NA_character_)),
     ) %>%
     filter(!is.na(titre))
 }
@@ -466,12 +473,12 @@ setdiff(viruses_2018, viruses_2018)
 
 # Extract viruses
 viruses <- titres %>%
-  select(virus, clade) %>%
+  select(virus, subtype, clade) %>%
   distinct()
 
-# Same virus can't be in different clades
+# Same virus can't be in different subtype/clades
 viruses %>%
-  count(virus, clade) %>%
+  count(virus, subtype, clade) %>%
   filter(n != 1)
 
 # Survey-derived info
@@ -496,7 +503,7 @@ animal_process %>% filter(!complete.cases(.))
 # Save
 
 save_data(subjects, "subject")
-save_data(titres, "titre")
+save_data(select(titres, id, study_year, visit, virus, titre), "titre")
 save_data(animal_possession, "animal-possession")
 save_data(animal_process, "animal-process")
 save_data(viruses, "virus")
