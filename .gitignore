@@ -8,3 +8,4 @@
 manuscript
 *.dta
 *.docx
+.~lock.*
