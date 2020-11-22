@@ -18,7 +18,7 @@ rule data:
         "data/titre.csv",
         "data/virus.csv",
         "data/animal-possession.csv",
-        "data/animal-process.csv",
+        "data/animal-sale.csv",
     shell:
         "Rscript data/data.R"
 
@@ -29,14 +29,14 @@ rule data_plot:
         "data/subject.csv",
         "data/titre.csv",
         "data/animal-possession.csv",
-        "data/animal-process.csv",
+        "data/animal-sale.csv",
         "data/read_data.R",
     output:
         "data-plot/age-gender-hist.pdf",
         "data-plot/titre.pdf",
         "data-plot/titre-multiple-years.pdf",
         "data-plot/animal-possession.pdf",
-        "data-plot/animal-process.pdf",
+        "data-plot/animal-sale.pdf",
         "data-plot/titre-summary.pdf",
     shell:
         "Rscript data-plot/data-plot.R"
@@ -48,13 +48,13 @@ rule data_table:
         "data/subject.csv",
         "data/titre.csv",
         "data/animal-possession.csv",
-        "data/animal-process.csv",
+        "data/animal-sale.csv",
         "data/read_data.R",
     output:
         "data-table/subject.csv",
         "data-table/titre.csv",
         "data-table/animal-possession.csv",
-        "data-table/animal-process.csv",
+        "data-table/animal-sale.csv",
     shell:
         "Rscript data-table/data-table.R"
 
