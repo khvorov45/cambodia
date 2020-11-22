@@ -204,7 +204,7 @@ animals_2015 %>% filter(!id %in% subjects_2015$id)
 
 # Animal processing
 
-animal_process_2015_prepare <- responses_2015 %>%
+animal_prepare_2015 <- responses_2015 %>%
   select(
     id,
     contains("n32"),
@@ -225,10 +225,10 @@ animal_process_2015_prepare <- responses_2015 %>%
   pivot_wider(names_from = "bound", values_from = "number") %>%
   filter(!is.na(from), !is.na(to), to > 0)
 
-animal_process_2015_prepare %>% check_no_duplicates(id, animal, type)
-animal_process_2015_prepare %>% filter(!id %in% subjects_2015$id)
+animal_prepare_2015 %>% check_no_duplicates(id, animal, type)
+animal_prepare_2015 %>% filter(!id %in% subjects_2015$id)
 
-animal_process_2015_sell <- responses_2015 %>%
+animal_sale_2015 <- responses_2015 %>%
   select(
     id,
     contains("n49"),
@@ -249,13 +249,13 @@ animal_process_2015_sell <- responses_2015 %>%
   pivot_wider(names_from = "bound", values_from = "number") %>%
   filter(!is.na(from), !is.na(to), to > 0)
 
-animal_process_2015_sell %>% check_no_duplicates(id, animal, type)
-animal_process_2015_sell %>% filter(!id %in% subjects_2015$id)
+animal_sale_2015 %>% check_no_duplicates(id, animal, type)
+animal_sale_2015 %>% filter(!id %in% subjects_2015$id)
 
 # There seems to be more responses with "sell" rather than "prepare".
 # In the subsequent years these questions seem to have been merged into
 # "how much do you sell/process". So I'm keeping "sell" from 2015 for the
-# animal processing table.
+# animal sale table.
 
 # Serology
 
@@ -355,7 +355,7 @@ animals_other_2017_plus <- responses_2017_plus %>%
 animals_other_2017_plus %>% check_no_duplicates(id, animal, study_year)
 
 # Animal processing
-animal_process_2017_plus <- responses_2017_plus %>%
+animal_sale_2017_plus <- responses_2017_plus %>%
   select(id, study_year, contains("n22")) %>%
   pivot_longer(contains("n22"), names_to = "code_og", values_to = "number") %>%
   filter(!is.na(number)) %>%
@@ -372,9 +372,9 @@ animal_process_2017_plus <- responses_2017_plus %>%
   pivot_wider(names_from = "bound", values_from = "number") %>%
   filter(to > 0)
 
-animal_process_2017_plus %>% check_no_duplicates(id, study_year, animal, type)
-animal_process_2017_plus %>% filter(to < from)
-animal_process_2017_plus %>% filter(!id %in% subjects_2017_plus$id)
+animal_sale_2017_plus %>% check_no_duplicates(id, study_year, animal, type)
+animal_sale_2017_plus %>% filter(to < from)
+animal_sale_2017_plus %>% filter(!id %in% subjects_2017_plus$id)
 
 # Serology
 
@@ -490,20 +490,18 @@ animal_possession <- bind_rows(
 animal_possession %>% check_no_duplicates(id, animal, study_year)
 animal_possession %>% filter(!id %in% subjects$id)
 
-animal_process <- bind_rows(
-  animal_process_2017_plus, animal_process_2015_sell
-) %>%
+animal_sale <- bind_rows(animal_sale_2017_plus, animal_sale_2015) %>%
   mutate(mid = (from + to) / 2)
 
-animal_process %>% check_no_duplicates(id, study_year, animal, type)
-animal_process %>% filter(to < from)
-animal_process %>% filter(!id %in% subjects$id)
-animal_process %>% filter(!complete.cases(.))
+animal_sale %>% check_no_duplicates(id, study_year, animal, type)
+animal_sale %>% filter(to < from)
+animal_sale %>% filter(!id %in% subjects$id)
+animal_sale %>% filter(!complete.cases(.))
 
 # Save
 
 save_data(subjects, "subject")
 save_data(select(titres, id, study_year, visit, virus, titre), "titre")
 save_data(animal_possession, "animal-possession")
-save_data(animal_process, "animal-process")
+save_data(animal_sale, "animal-sale")
 save_data(viruses, "virus")
