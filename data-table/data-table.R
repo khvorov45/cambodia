@@ -155,12 +155,12 @@ animal_possession %>%
   save_data("animal-possession")
 
 # Animal processing
-animal_process <- read_data("animal-process")
+animal_sale <- read_data("animal-sale")
 
-head_ids <- animal_process %>%
+head_ids <- animal_sale %>%
   filter(type == "head") %>%
   pull(id)
-kg_ids <- animal_process %>%
+kg_ids <- animal_sale %>%
   filter(type == "kg") %>%
   pull(id)
 
@@ -168,11 +168,11 @@ setdiff(head_ids, kg_ids)
 setdiff(kg_ids, head_ids)
 # All heads seem to be in kilograms
 
-animal_process %>%
+animal_sale %>%
   group_by(study_year, animal, type) %>%
   summarise(
     summary = summarise_count(mid),
     .groups = "drop"
   ) %>%
   pivot_wider(names_from = "type", values_from = "summary") %>%
-  save_data("animal-process")
+  save_data("animal-sale")
