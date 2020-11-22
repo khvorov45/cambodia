@@ -144,7 +144,7 @@ titre_summ <- titre_mod %>%
 save_plot(titre_summ, "titre-summary", width = 20, height = 25)
 
 # Plots for individuals with multiple years data
-titre_plot_multiple_years <- titre %>%
+titre_plot_multiple_years <- titre_mod %>%
   group_by(id, virus) %>%
   filter(length(unique(study_year)) > 1) %>%
   ungroup() %>%
