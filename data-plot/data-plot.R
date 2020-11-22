@@ -19,21 +19,16 @@ wrap_virus_names <- function(names) {
 }
 
 titre_plot <- function(data, min_y = NULL, max_y = NULL) {
-  data_mod <- data %>%
-    mutate(
-      virus_lbl = paste0(virus, "\n", clade) %>% fct_reorder(as.integer(virus)),
-      visit = as.character(visit)
-    )
-  sample_sizes <- data_mod %>%
+  sample_sizes <- data %>%
     group_by(study_year, virus_lbl) %>%
     summarise(
       n_ind = length(unique(id)),
-      visit = first(data_mod$visit),
+      visit_lbl = first(data$visit_lbl),
       titre = 2560,
       .groups = "drop"
     )
-  data_mod %>%
-    ggplot(aes(visit, titre)) +
+  data %>%
+    ggplot(aes(visit_lbl, titre)) +
     theme_bw() +
     theme(
       strip.background = element_blank(),
@@ -96,8 +91,14 @@ save_plot(
 titre <- read_data("titre")
 virus <- read_data("virus")
 
+titre_mod <- inner_join(titre, virus, by = "virus") %>%
+  mutate(
+    virus_lbl = paste(virus, subtype) %>% fct_reorder(as.integer(virus)),
+    visit_lbl = factor(visit)
+  )
+
 # All titre data
-titre_plots <- titre %>%
+titre_plots <- titre_mod %>%
   group_split(study_year) %>%
   map(titre_plot, min(titre$titre), max(titre$titre)) %>%
   map(facet_year_virus)
@@ -107,14 +108,11 @@ titre_plots_arranged <- arrange_plots(plotlist = titre_plots, ncol = 1)
 save_plot(titre_plots_arranged, "titre", width = 50, height = 25)
 
 # Titre summary
-titre_summ <- titre %>%
-  group_by(visit, virus, clade, study_year) %>%
+titre_summ <- titre_mod %>%
+  group_by(visit_lbl, virus, subtype, study_year) %>%
   summarise(
     titre = exp(mean(log(titre))),
     .groups = "drop"
-  ) %>%
-  mutate(
-    visit_lbl = factor(visit),
   ) %>%
   ggplot(aes(virus, titre, col = visit_lbl, fill = visit_lbl)) +
   ggdark::dark_theme_bw(verbose = FALSE) +
@@ -132,11 +130,11 @@ titre_summ <- titre %>%
   scale_shape_discrete("Visit") +
   guides(fill = guide_legend(override.aes = list(alpha = 0.5))) +
   facet_wrap(~study_year, ncol = 1) +
-  geom_ribbon(aes(ymin = 5, ymax = titre, group = visit)) +
-  geom_line(aes(group = visit, lty = visit_lbl)) +
+  geom_ribbon(aes(ymin = 5, ymax = titre, group = visit_lbl)) +
+  geom_line(aes(group = visit_lbl, lty = visit_lbl)) +
   geom_point(aes(shape = visit_lbl)) +
   geom_text(
-    aes(y = 5, x = virus, label = clade),
+    aes(y = 5, x = virus, label = subtype),
     angle = 90, hjust = 0,
     size = 3, col = "gray50",
     data = virus,
