@@ -86,6 +86,26 @@ save_plot(
   width = 15, height = 5 * length(unique(subject$study_year))
 )
 
+# Animal slaughter participation
+
+slaughter_plot <- subject %>%
+  mutate_if(is.factor, fct_explicit_na) %>%
+  count(study_year, slaughter) %>%
+  ggplot(aes(slaughter, n)) +
+  ggdark::dark_theme_bw(verbose = FALSE) +
+  common_theme +
+  theme(axis.text.x = element_text(angle = 35, hjust = 1)) +
+  facet_wrap(~study_year, nrow = 1) +
+  scale_x_discrete("Slaughter animals") +
+  scale_y_continuous("Count", expand = expansion(c(0, 0.1))) +
+  geom_bar(stat = "identity", fill = "gray50") +
+  geom_text(aes(label = n, y = 1), vjust = 0)
+
+save_plot(
+  slaughter_plot, "slaughter",
+  width = 5 * length(unique(subject$study_year)), height = 8
+)
+
 # Serology
 
 titre <- read_data("titre")
