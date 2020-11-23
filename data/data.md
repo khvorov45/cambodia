@@ -7,6 +7,8 @@ tables by year (`study_year`).
 - `gender` [chr] "Male" or "Female"
 - `age_years` [num] Age in years at visit 1 for that year. Date of birth is also
   present in the survey but more people responded to age, so using this instead.
+- `slaughter` [chr] Whether they participate in the slaughtering process.
+  "Never", "Sometimes" or "Everyday"
 - `study_year` [num] Study year (e.g. 2015)
 
 # virus

@@ -39,9 +39,14 @@ read_data <- function(name) {
       virus = col_factor(virus_order)
     )
   }
-  if (name == "virus") {
+  else if (name == "virus") {
     col_types_specific <- list(
       virus = col_factor(virus_order)
+    )
+  }
+  else if (name == "subject") {
+    col_types_specific <- list(
+      slaughter = col_factor(c("Never", "Sometimes", "Everyday"))
     )
   }
   col_types <- c(col_types_common, col_types_specific)

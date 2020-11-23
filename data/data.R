@@ -157,15 +157,17 @@ responses_2015 <- read_raw("responses-2015", "dta") %>%
     contains("n50"),
     contains("n51"),
     contains("n52"),
+    # Do you participate in the poultry slaughtering process?
+    slaughter = n22doyoupa,
   ) %>%
   mutate(
-    gender = as_factor(gender, levels = "labels"),
+    across(c(gender, slaughter), ~ as_factor(.x, levels = "labels"))
   )
 
 # Extract subjects
 
 subjects_2015 <- responses_2015 %>%
-  select(id, gender, age_years) %>%
+  select(id, gender, age_years, slaughter) %>%
   mutate(study_year = 2015)
 
 # Should be no duplicate ids
@@ -176,6 +178,9 @@ subjects_2015$gender %>% unique()
 
 # Check age
 subjects_2015$age_years %>% summary()
+
+# Check slaughter
+subjects_2015$slaughter %>% unique()
 
 # Should be no missing data
 subjects_2015 %>% filter(!complete.cases(.))
@@ -301,20 +306,22 @@ responses_2017_plus <- read_raw("responses-2017", "dta") %>%
     gender = n12gender,
     date_interview = n1intervie,
     contains("n18"),
-    contains("n22")
+    contains("n22"),
+    # Do you participate in paultry/pig slaughtering process?
+    slaughter = n49doyoupa,
   ) %>%
   mutate(
     # Remove visit indicator from id
     id_og = id,
     id = str_replace(id, "^\\d+", ""),
-    gender = as_factor(gender, levels = "labels"),
+    across(c(gender, slaughter), ~ as_factor(.x, levels = "labels")),
     study_year = lubridate::year(date_interview),
   )
 
 subjects_2017_plus <- responses_2017_plus %>%
-  select(id, age_years, gender, study_year)
+  select(id, age_years, gender, slaughter, study_year)
 
-# Should be no missing data
+# Check missing data
 subjects_2017_plus %>% filter(!complete.cases(.))
 
 # Check gender
@@ -322,6 +329,9 @@ unique(subjects_2017_plus$gender)
 
 # Check age
 summary(subjects_2017_plus$age_years)
+
+# Check slaughter
+unique(subjects_2017_plus$slaughter)
 
 # Check that ids don't repeat within a year
 subjects_2017_plus %>% check_no_duplicates(id, study_year)
@@ -439,7 +449,7 @@ subjects <- bind_rows(list(subjects_2015, subjects_2017_plus))
 # Combine all titres
 titres <- bind_rows(list(titres_2015, titres_2017, titres_2018))
 
-# Should be no missing data
+# Check missing data
 subjects %>% filter(!complete.cases(.))
 titres %>% filter(!complete.cases(.))
 
