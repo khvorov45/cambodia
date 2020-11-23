@@ -17,6 +17,7 @@ tables by year (`study_year`).
 - `subtype` [chr] Virus subtype (e.g. H5N1)
 - `clade` [chr] Virus clade (e.g. Cl1.1.2). Wasn't present for all viruses, so
   some are missing
+- `haem` [num] Haemagglutinin type (missing for B)
 
 # titre
 

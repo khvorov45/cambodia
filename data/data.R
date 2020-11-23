@@ -110,6 +110,12 @@ fix_clades <- function(clades) {
     str_replace("B Yam", "BYam")
 }
 
+extract_haem <- function(subtype) {
+  if_else(
+    str_starts(subtype, "H"), str_extract(subtype, "\\d"), NA_character_
+  ) %>% as.integer()
+}
+
 extract_titres <- function(data) {
   data %>%
     select(id, visit, contains("A/"), contains("B/")) %>%
@@ -123,6 +129,7 @@ extract_titres <- function(data) {
       subtype = str_split(clade_og, " ") %>% map_chr(1),
       clade = str_split(clade_og, " ") %>%
         map_chr(~ pluck(.x, 2, .default = NA_character_)),
+      haem = extract_haem(subtype),
     ) %>%
     filter(!is.na(titre))
 }
@@ -478,7 +485,7 @@ setdiff(viruses_2018, viruses_2018)
 
 # Extract viruses
 viruses <- titres %>%
-  select(virus, subtype, clade) %>%
+  select(virus, subtype, clade, haem) %>%
   distinct()
 
 # Same virus can't be in different subtype/clades
