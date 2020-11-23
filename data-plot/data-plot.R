@@ -126,7 +126,8 @@ virus <- read_data("virus")
 
 titre_mod <- inner_join(titre, virus, by = "virus") %>%
   mutate(
-    virus_lbl = paste(virus, subtype) %>% fct_reorder(as.integer(virus)),
+    virus_lbl = paste(virus, subtype, sep = "\n") %>%
+      fct_reorder(as.integer(virus)),
     visit_lbl = factor(visit)
   )
 
