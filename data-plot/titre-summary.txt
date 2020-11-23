@@ -1,1 +1,1 @@
-Average titres for each virus/visit/year
+GMT's and 95% CIs for each virus/visit/year
