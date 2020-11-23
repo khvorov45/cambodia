@@ -141,6 +141,20 @@ titre_plots_arranged <- arrange_plots(plotlist = titre_plots, ncol = 1)
 save_plot(titre_plots_arranged, "titre", width = 50, height = 25)
 
 # Titre summary
+titre_summ_scales <- function(xlab = "Virus", ylow_expansion = 0.01) {
+  list(
+    scale_x_discrete(xlab),
+    scale_y_log10(
+      "GMT (95% CI)",
+      breaks = 5 * 2^(0:10), expand = expansion(mult = c(ylow_expansion, 0.05))
+    ),
+    scale_fill_brewer("Visit", type = "div"),
+    scale_color_brewer("Visit", type = "div"),
+    scale_linetype_discrete("Visit"),
+    scale_shape_discrete("Visit")
+  )
+}
+
 titre_summ <- titre_mod %>%
   group_by(visit_lbl, virus, subtype, study_year) %>%
   summarise(summ_geom_mean(titre), .groups = "drop") %>%
@@ -152,15 +166,7 @@ titre_summ <- titre_mod %>%
     plot.margin = margin(1, 1, 1, 1, unit = "cm"),
     legend.position = "bottom",
   ) +
-  scale_x_discrete("Virus") +
-  scale_y_log10(
-    "Average titre",
-    breaks = 5 * 2^(0:10), expand = expansion(mult = c(0.01, 0.05))
-  ) +
-  scale_fill_brewer("Visit", type = "div") +
-  scale_color_brewer("Visit", type = "div") +
-  scale_linetype_discrete("Visit") +
-  scale_shape_discrete("Visit") +
+  titre_summ_scales() +
   facet_wrap(~study_year, ncol = 1) +
   geom_pointrange(
     aes(shape = visit_lbl, ymin = low, ymax = high),
@@ -173,8 +179,26 @@ titre_summ <- titre_mod %>%
     data = virus,
     inherit.aes = FALSE
   )
-titre_summ
 save_plot(titre_summ, "titre-summary", width = 20, height = 25)
+
+tittre_summ_by_h <- titre_mod %>%
+  group_by(id, study_year, visit_lbl, haem) %>%
+  summarise(titre = exp(mean(log(titre))), .groups = "drop") %>%
+  group_by(visit_lbl, study_year, haem) %>%
+  summarise(summ_geom_mean(titre), .groups = "drop") %>%
+  ggplot(
+    aes(haem, point, ymin = low, ymax = high, col = visit_lbl, fill = visit_lbl)
+  ) +
+  ggdark::dark_theme_bw(verbose = FALSE) +
+  common_theme +
+  theme(legend.position = "bottom") +
+  titre_summ_scales("Haemagglutinin type", 0.05) +
+  facet_wrap(~study_year, ncol = 1) +
+  geom_pointrange(
+    aes(shape = visit_lbl),
+    position = position_dodge(width = 0.6)
+  )
+save_plot(tittre_summ_by_h, "titre-summary-by-haem", width = 15, height = 20)
 
 # Plots for individuals with multiple years data
 titre_plot_multiple_years <- titre_mod %>%

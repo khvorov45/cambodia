@@ -1,0 +1,3 @@
+GMT (95%) CI for each H-type/visit/year. Titres from multiple viruses
+(for the same H-type/visit/year) were
+averaged (geometric mean) for each individual first and then across individuals.

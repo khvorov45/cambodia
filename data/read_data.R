@@ -40,7 +40,8 @@ read_data <- function(name) {
   }
   else if (name == "virus") {
     col_types_specific <- list(
-      virus = col_factor(virus_order)
+      virus = col_factor(virus_order),
+      haem = col_factor(c("H1", "H3", "H5", "H7", "H9", "BVic", "BYam"))
     )
   }
   else if (name == "subject") {
