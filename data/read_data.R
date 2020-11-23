@@ -17,16 +17,15 @@ read_data <- function(name) {
     "A/duck/Cambodia/33W2M3/2013",
     "A/chicken/Cambodia/Z89W11M1/2015",
     "A/chicken/Cambodia/a27W9M1/2016",
-    "A/chicken/Cambodia/B18W4M1/2017",
     "A/chicken/Cambodia/b0426502/2017",
-    "A/chicken/Cambodia/11K-22-3-C2/2018",
     "A/chicken/Cambodia/9T-24-1-C4/2018",
     "A/duck/Cambodia/c14T241D4/2019",
     ## H7
     "A/duck/Cambodia/12T-24-1-D3-p1e2/2018",
     ## H9
     "A/chicken/Cambodia/a38W9M1/2016",
-
+    "A/chicken/Cambodia/B18W4M1/2017",
+    "A/chicken/Cambodia/11K-22-3-C2/2018",
     # B
     ## Vic
     "B/Brisbane/60/2008-like",
