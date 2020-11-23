@@ -112,8 +112,8 @@ fix_clades <- function(clades) {
 
 extract_haem <- function(subtype) {
   if_else(
-    str_starts(subtype, "H"), str_extract(subtype, "\\d"), NA_character_
-  ) %>% as.integer()
+    str_starts(subtype, "H"), str_extract(subtype, "H\\d"), subtype
+  )
 }
 
 extract_titres <- function(data) {
