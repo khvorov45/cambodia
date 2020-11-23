@@ -252,11 +252,6 @@ animal_sale_2015 <- responses_2015 %>%
 animal_sale_2015 %>% check_no_duplicates(id, animal, type)
 animal_sale_2015 %>% filter(!id %in% subjects_2015$id)
 
-# There seems to be more responses with "sell" rather than "prepare".
-# In the subsequent years these questions seem to have been merged into
-# "how much do you sell/process". So I'm keeping "sell" from 2015 for the
-# animal sale table.
-
 # Serology
 
 serology_2015 <- read_raw(
