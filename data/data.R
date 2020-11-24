@@ -494,7 +494,31 @@ setdiff(viruses_2018, viruses_2018)
 # Extract viruses
 viruses <- titres %>%
   select(virus, subtype, clade, haem) %>%
-  distinct()
+  distinct() %>%
+  mutate(
+    short = recode(
+      virus,
+      "A/chicken/Cambodia/Z89W11M1/2015" = "CambZ89",
+      "A/chicken/Cambodia/a38W9M1/2016" = "CambA38",
+      "A/chicken/Cambodia/11K-22-3-C2/2018" = "Camb11K",
+      "A/duck/Cambodia/33W2M3/2013" = "Camb33W",
+      "A/chicken/Cambodia/a27W9M1/2016" = "CambA27",
+      "A/Switzerland/9715293/2013-like" = "Switz971",
+      "A/California/7/2009-like" = "Cali7",
+      "B/Brisbane/60/2008-like" = "Bris60",
+      "B/Phuket/3073/2013-like" = "Phuk30",
+      "A/chicken/Cambodia/b0426502/2017" = "CambB04",
+      "A/chicken/Cambodia/B18W4M1/2017" = "CambB18",
+      "A/chicken/Cambodia/9T-24-1-C4/2018" = "Camb9T",
+      "A/duck/Cambodia/12T-24-1-D3-p1e2/2018" = "Camb12T",
+      "A/Michigan/45/2015pdm09-like" = "Mich45",
+      "A/Hong Kong/4801/2014-like" = "HKong48",
+      "A/Singapore/INFIMH-16-0019/2016-like" = "Sing16",
+      "A/duck/Cambodia/c14T241D4/2019" = "CambC14",
+      "A/Switzerland/8060/2017-like" = "Switz80",
+      "B/Colorado/6/2017-like" = "Col6",
+    )
+  )
 
 # Same virus can't be in different subtype/clades
 viruses %>%

@@ -19,6 +19,7 @@ tables by year (`study_year`).
 - `clade` [chr] Virus clade (e.g. Cl1.1.2). Wasn't present for all viruses, so
   some are missing
 - `haem` [num] Haemagglutinin type (same as subtype for B)
+- `short` [chr] Short name
 
 # titre
 
