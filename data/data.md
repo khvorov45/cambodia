@@ -10,6 +10,7 @@ tables by year (`study_year`).
 - `slaughter` [chr] Whether they participate in the slaughtering process.
   "Never", "Sometimes" or "Everyday"
 - `study_year` [num] Study year (e.g. 2015)
+- `workplace` [chr] Workplace
 
 # virus
 

@@ -152,6 +152,7 @@ responses_2015 <- read_raw("responses-2015", "dta") %>%
     id = idcode2015,
     gender = n12gender,
     age_years = n10ageyear,
+    workplace = n8workplac,
     contains("n42"),
     contains("n43"),
     # How much do you prepare?
@@ -168,13 +169,13 @@ responses_2015 <- read_raw("responses-2015", "dta") %>%
     slaughter = n22doyoupa,
   ) %>%
   mutate(
-    across(c(gender, slaughter), ~ as_factor(.x, levels = "labels"))
+    across(c(gender, slaughter, workplace), ~ as_factor(.x, levels = "labels"))
   )
 
 # Extract subjects
 
 subjects_2015 <- responses_2015 %>%
-  select(id, gender, age_years, slaughter) %>%
+  select(id, gender, age_years, slaughter, workplace) %>%
   mutate(study_year = 2015)
 
 # Should be no duplicate ids
@@ -188,6 +189,9 @@ subjects_2015$age_years %>% summary()
 
 # Check slaughter
 subjects_2015$slaughter %>% unique()
+
+# Check workplace
+subjects_2015$workplace %>% unique()
 
 # Should be no missing data
 subjects_2015 %>% filter(!complete.cases(.))
@@ -312,6 +316,7 @@ responses_2017_plus <- read_raw("responses-2017", "dta") %>%
     age_years = n10ageyear,
     gender = n12gender,
     date_interview = n1intervie,
+    workplace = n8workplac,
     contains("n18"),
     contains("n22"),
     # Do you participate in paultry/pig slaughtering process?
@@ -321,12 +326,12 @@ responses_2017_plus <- read_raw("responses-2017", "dta") %>%
     # Remove visit indicator from id
     id_og = id,
     id = str_replace(id, "^\\d+", ""),
-    across(c(gender, slaughter), ~ as_factor(.x, levels = "labels")),
+    across(c(gender, slaughter, workplace), ~ as_factor(.x, levels = "labels")),
     study_year = lubridate::year(date_interview),
   )
 
 subjects_2017_plus <- responses_2017_plus %>%
-  select(id, age_years, gender, slaughter, study_year)
+  select(id, age_years, gender, slaughter, workplace, study_year)
 
 # Check missing data
 subjects_2017_plus %>% filter(!complete.cases(.))
@@ -339,6 +344,9 @@ summary(subjects_2017_plus$age_years)
 
 # Check slaughter
 unique(subjects_2017_plus$slaughter)
+
+# Check workplace
+responses_2017_plus$workplace %>% unique()
 
 # Check that ids don't repeat within a year
 subjects_2017_plus %>% check_no_duplicates(id, study_year)
