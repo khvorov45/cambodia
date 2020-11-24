@@ -206,7 +206,7 @@ titre_plot_multiple_years <- titre_mod %>%
   group_by(id, virus) %>%
   filter(length(unique(study_year)) > 1) %>%
   ungroup() %>%
-  mutate(visit = glue::glue("{study_year}-{visit}")) %>%
+  mutate(visit_lbl = glue::glue("{study_year}-{visit}")) %>%
   titre_plot() +
   theme(axis.text.x = element_text(angle = 90)) +
   facet_wrap(~virus_lbl, labeller = as_labeller(wrap_virus_names), nrow = 1)
