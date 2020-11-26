@@ -38,6 +38,8 @@ rule data_plot:
         "data-plot/animal-possession.pdf",
         "data-plot/animal-sale.pdf",
         "data-plot/titre-summary.pdf",
+        "data-plot/titre-summary-by-haem.pdf",
+        "data-plot/slaughter.pdf",
     shell:
         "Rscript data-plot/data-plot.R"
 
