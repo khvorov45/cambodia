@@ -40,7 +40,6 @@ titre_plot <- function(data, min_y = NULL, max_y = NULL) {
     scale_y_log10("Titre", breaks = 5 * 2^(0:10)) +
     scale_x_discrete("Visit") +
     geom_line(aes(group = id, col = id), alpha = 0.5) +
-    geom_point(alpha = 0.5) +
     geom_text(data = sample_sizes, mapping = aes(label = n_ind), hjust = 0)
 }
 
