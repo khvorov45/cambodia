@@ -56,6 +56,7 @@ fit_mixak <- function(data, outcome, fixed_formula) {
     mixAK::NMixRelabel(type = "stephens", keep.comp.prob = TRUE)
   fit$outcome_names <- colnames(y)
   fit$fixed_names <- map(x, colnames)
+  fit$ids <- tibble(id = unique(data$id)) %>% mutate(index = row_number())
   fit
 }
 
@@ -115,6 +116,24 @@ tidy_mixak <- function(fit) {
   )
 }
 
+cluster_assignment_mixak <- function(fit) {
+  map_dfr(1:2, function(c) {
+    fit[[c]]$comp.prob %>%
+      as_tibble() %>%
+      mutate(iteration = row_number()) %>%
+      pivot_longer(contains("P"), names_to = "of", values_to = "prob") %>%
+      mutate(
+        index = str_replace(of, "^P\\((\\d+),\\d+\\)$", "\\1") %>%
+          as.integer(),
+        cluster = str_replace(of, "^P\\(\\d+,(\\d+)\\)$", "\\1") %>%
+          as.integer(),
+        chain = c,
+      ) %>%
+      inner_join(fit$ids, by = "index") %>%
+      select(-of, -index)
+  })
+}
+
 # Script ======================================================================
 
 titres <- inner_join(read_data("titre"), read_data("virus"), by = "virus")
@@ -130,7 +149,7 @@ titres_wide <- titres %>%
 
 fit <- fit_mixak(titres_wide, c(Mich45, Switz80), ~yearvisit)
 
-fit %>%
-  tidy_mixak() %>%
-  group_by(virus, parameter, effect) %>%
-  summarise(mean_est = mean(estimate), .groups = "drop")
+comp_probs <- fit %>%
+  cluster_assignment_mixak() %>%
+  group_by(id, cluster, chain) %>%
+  summarise(mn = mean(prob), med = median(prob), .groups = "drop")
