@@ -6,7 +6,9 @@ library(tidyverse)
 
 source("data/read_data.R")
 
-fit_mixak <- function(data, outcome, fixed_formula) {
+fit_mixak <- function(data,
+                      outcome, fixed_formula, n_clusters,
+                      burn = 1000, keep = 10000, thin = 10) {
   y <- data %>%
     select(!!!rlang::enquos(outcome)) %>%
     as.data.frame()
@@ -46,17 +48,19 @@ fit_mixak <- function(data, outcome, fixed_formula) {
 
     prior.b = list(
       # Clusters
-      Kmax = 2
+      Kmax = n_clusters
     ),
 
     # MCMC settings
-    nMCMC = c(burn = 100, keep = 1000, thin = 10, info = 100),
-    parallel = FALSE
+    nMCMC = c(burn = burn, keep = keep, thin = thin, info = 100),
+    parallel = TRUE
   ) %>%
     mixAK::NMixRelabel(type = "stephens", keep.comp.prob = TRUE)
   fit$outcome_names <- colnames(y)
   fit$fixed_names <- map(x, colnames)
   fit$ids <- tibble(id = unique(data$id)) %>% mutate(index = row_number())
+  fit$n_clusters <- n_clusters
+  fit$mcmc_settings <- tibble(burn = burn, keep = keep, thin = thin)
   fit
 }
 
@@ -134,6 +138,16 @@ cluster_assignment_mixak <- function(fit) {
   })
 }
 
+pull_diagnostics <- function(fit) {
+  tibble(
+    outcome = list(fit$outcome_names),
+    fixed = list(fit$fixed_names),
+    n_clusters = fit$n_clusters,
+    ped = fit$PED[["PED"]],
+  ) %>%
+    bind_cols(fit$mcmc_settings)
+}
+
 # Script ======================================================================
 
 titres <- inner_join(read_data("titre"), read_data("virus"), by = "virus")
@@ -147,7 +161,7 @@ titres_wide <- titres %>%
   pivot_wider(names_from = "short", values_from = logtitremid) %>%
   mutate(yearvisit = paste(study_year, visit, sep = "v"))
 
-fit <- fit_mixak(titres_wide, c(Mich45, Switz80), ~yearvisit)
+fit <- fit_mixak(titres_wide, c(Mich45, Switz80), ~yearvisit, 2)
 
 comp_probs <- fit %>%
   cluster_assignment_mixak() %>%
