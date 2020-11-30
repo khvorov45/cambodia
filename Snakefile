@@ -67,7 +67,9 @@ rule cluster:
         "data/titre.csv",
         "data/virus.csv",
     output:
-        "cluster/opt-cluster-num.csv",
+        "cluster/clusters.csv",
+        "cluster/diag.csv",
+        "cluster/parameters.csv",
     shell:
         "Rscript cluster/cluster.R"
 

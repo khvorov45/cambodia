@@ -8,7 +8,7 @@ source("data/read_data.R")
 
 fit_mixak <- function(data,
                       outcome, fixed_formula, n_clusters,
-                      burn = 1000, keep = 10000, thin = 10) {
+                      burn, keep, thin) {
   y <- data %>%
     select(!!!rlang::enquos(outcome)) %>%
     as.data.frame()
@@ -154,19 +154,30 @@ save_data <- function(data, name) {
       mutate(across(where(is.list), ~ map_chr(., jsonlite::toJSON))),
     glue::glue("cluster/{name}.csv")
   )
+  data
 }
 
 # Script ======================================================================
 
 titres <- inner_join(read_data("titre"), read_data("virus"), by = "virus")
 
+# Find viruses that don't change
+titres_no_change <- titres %>%
+  group_by(short) %>%
+  summarise(unique_measures = length(unique(titre)), .groups = "drop") %>%
+  filter(unique_measures == 1) %>%
+  pull(short)
+
 titres_wide <- titres %>%
+  # Remove viruses that don't change since they provide no information
+  filter(!short %in% titres_no_change) %>%
   mutate(
     across(c(study_year, visit), factor),
     logtitremid = if_else(titre == 5, log(5), log(titre) + log(2) / 2)
   ) %>%
   select(id, study_year, visit, short, logtitremid) %>%
   pivot_wider(names_from = "short", values_from = logtitremid) %>%
+  # Add yearvisit for convenience
   mutate(yearvisit = paste(study_year, visit, sep = "v"))
 
 # Fit with different clusters
@@ -174,11 +185,39 @@ future::plan(future::multisession)
 diff_cl <- furrr::future_map(
   1:4,
   ~ fit_mixak(
-    titres_wide, c(Mich45, Switz80), ~yearvisit,
+    titres_wide,
+    # Errors occur with the inclusion of CambZ89
+    c(
+      CambA38, Camb11K, Camb33W, CambA27, Switz971, Cali7,
+      Bris60, Phuk30, CambB04, CambB18, Camb9T, Mich45, HKong48, Sing16,
+      Switz80, Col6
+    ),
+    ~yearvisit,
     n_clusters = .x,
-    burn = 100,
-    keep = 500,
+    burn = 100, keep = 500, thin = 10
   )
 )
+diff_cl %>%
+  map_dfr(pull_diagnostics) %>%
+  save_data("diag")
 
-save_data(diff_cl %>% map_dfr(pull_diagnostics), "opt-cluster-num")
+map_with_cl <- function(.x, .f, ...) {
+  map_dfr(.x, ~ .f(.x) %>% mutate(n_clusters = .x$n_clusters), ...)
+}
+diff_cl %>%
+  map_with_cl(tidy_mixak) %>%
+  save_data("parameters")
+
+diff_cl %>%
+  map_with_cl(cluster_assignment_mixak) %>%
+  group_by(cluster, chain, id, n_clusters) %>%
+  summarise(
+    prob_mn = mean(prob),
+    prob_q025 = quantile(prob, 0.025),
+    prob_q25 = quantile(prob, 0.25),
+    prob_q50 = quantile(prob, 0.5),
+    prob_q75 = quantile(prob, 0.75),
+    prob_q975 = quantile(prob, 0.975),
+    .groups = "drop"
+  ) %>%
+  save_data("clusters")
