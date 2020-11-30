@@ -169,4 +169,16 @@ titres_wide <- titres %>%
   pivot_wider(names_from = "short", values_from = logtitremid) %>%
   mutate(yearvisit = paste(study_year, visit, sep = "v"))
 
-# The rest is split into multiple files, otherwise takes too long
+# Fit with different clusters
+future::plan(future::multisession)
+diff_cl <- furrr::future_map(
+  1:4,
+  ~ fit_mixak(
+    titres_wide, c(Mich45, Switz80), ~yearvisit,
+    n_clusters = .x,
+    burn = 100,
+    keep = 500,
+  )
+)
+
+save_data(diff_cl %>% map_dfr(pull_diagnostics), "opt-cluster-num")

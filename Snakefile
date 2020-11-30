@@ -60,23 +60,16 @@ rule data_table:
     shell:
         "Rscript data-table/data-table.R"
 
-rule opt_cluster_num:
+rule cluster:
     input:
         ".deps-installed",
         "cluster/cluster.R",
-        "cluster/opt-cluster-num.R",
         "data/titre.csv",
         "data/virus.csv",
     output:
         "cluster/opt-cluster-num.csv",
     shell:
-        "Rscript cluster/opt-cluster-num.R"
-
-rule cluster:
-    input:
-        rules.opt_cluster_num.output,
-    output:
-        touch("cluster/.cluster-run")
+        "Rscript cluster/cluster.R"
 
 rule zip:
     input:
