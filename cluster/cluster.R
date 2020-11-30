@@ -148,6 +148,14 @@ pull_diagnostics <- function(fit) {
     bind_cols(fit$mcmc_settings)
 }
 
+save_data <- function(data, name) {
+  write_csv(
+    data %>%
+      mutate(across(where(is.list), ~ map_chr(., jsonlite::toJSON))),
+    glue::glue("cluster/{name}.csv")
+  )
+}
+
 # Script ======================================================================
 
 titres <- inner_join(read_data("titre"), read_data("virus"), by = "virus")
@@ -161,9 +169,4 @@ titres_wide <- titres %>%
   pivot_wider(names_from = "short", values_from = logtitremid) %>%
   mutate(yearvisit = paste(study_year, visit, sep = "v"))
 
-fit <- fit_mixak(titres_wide, c(Mich45, Switz80), ~yearvisit, 2)
-
-comp_probs <- fit %>%
-  cluster_assignment_mixak() %>%
-  group_by(id, cluster, chain) %>%
-  summarise(mn = mean(prob), med = median(prob), .groups = "drop")
+# The rest is split into multiple files, otherwise takes too long

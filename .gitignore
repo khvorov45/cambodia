@@ -9,3 +9,4 @@ manuscript
 *.dta
 *.docx
 .~lock.*
+.cluster-run
