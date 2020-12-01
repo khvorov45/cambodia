@@ -194,7 +194,7 @@ diff_cl <- furrr::future_map(
     ),
     ~yearvisit,
     n_clusters = .x,
-    burn = 100, keep = 500, thin = 10
+    burn = 100, keep = 500, thin = 1
   )
 )
 diff_cl %>%
