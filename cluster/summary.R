@@ -50,16 +50,18 @@ trace_plots <- parameters %>%
   group_by(virus) %>%
   group_map(trace_plot)
 
+panel_counts <- parameters %>% count(virus, parameter, n_clusters)
+
 if (!dir.exists("cluster/trace-plots")) dir.create("cluster/trace-plots")
 save_trace_plot <- function(trace_pl) {
   key <- attr(trace_pl, "key")
   vir <- key$virus[[1]]
-  hor_facets <- parameters %>%
+  hor_facets <- panel_counts %>%
     filter(virus == vir) %>%
     pull(n_clusters) %>%
     unique() %>%
     length()
-  ver_facets <- parameters %>%
+  ver_facets <- panel_counts %>%
     filter(virus == vir) %>%
     pull(parameter) %>%
     unique() %>%
