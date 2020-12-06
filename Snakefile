@@ -73,12 +73,23 @@ rule cluster:
     shell:
         "Rscript cluster/cluster.R"
 
+rule cluster_summary:
+    input:
+        ".deps-installed",
+        "cluster/summary.R",
+        "cluster/parameters.csv",
+    output:
+        directory("cluster/trace-plots")
+    shell:
+        "Rscript cluster/summary.R"
+
 rule zip:
     input:
         rules.data.output,
         rules.data_plot.output,
         rules.data_table.output,
         rules.cluster.output,
+        rules.cluster_summary.output,
     output:
         "cambodia.zip"
     shell:
