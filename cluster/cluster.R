@@ -188,8 +188,9 @@ diff_cl <- furrr::future_map(
     titres_wide,
     # Errors occur with the inclusion of CambZ89
     c(
-      CambA38, Camb11K, Camb33W, CambA27, Switz971, Cali7,
-      Bris60, Phuk30, CambB04, CambB18, Camb9T, Mich45, HKong48, Sing16,
+      # Remove comments for non-test runs
+      # CambA38, Camb11K, Camb33W, CambA27, Switz971, Cali7,
+      # Bris60, Phuk30, CambB04, CambB18, Camb9T, Mich45, HKong48, Sing16,
       Switz80, Col6
     ),
     ~yearvisit,
