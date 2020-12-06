@@ -15,7 +15,7 @@ trace_plot <- function(data, key) {
         fct_reorder(n_clusters)
     ) %>%
     ggplot(aes(iteration, estimate, col = chain_lbl)) +
-    ggdark::dark_theme_bw(verbose = FALSE) +
+    theme_bw() +
     theme(
       legend.position = "none",
       axis.text.x = element_blank(),
@@ -32,7 +32,7 @@ trace_plot <- function(data, key) {
 }
 
 save_plot <- function(plot, name, ...) {
-  ggdark::ggsave_dark(
+  ggsave(
     glue::glue("cluster/{name}.pdf"), plot,
     units = "cm", ...
   )
@@ -70,5 +70,7 @@ save_trace_plot <- function(trace_pl) {
     width = hor_facets * 5,
     height = ver_facets * 5
   )
+  invisible(NULL)
 }
-walk(trace_plots, save_trace_plot)
+future::plan(future::multisession)
+furrr::future_map(trace_plots, save_trace_plot)
