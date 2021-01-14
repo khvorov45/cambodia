@@ -153,6 +153,7 @@ responses_2015 <- read_raw("responses-2015", "dta") %>%
     gender = n12gender,
     age_years = n10ageyear,
     workplace = n8workplac,
+    # Number of poultry stored
     contains("n42"),
     contains("n43"),
     # How much do you prepare?
@@ -317,9 +318,11 @@ responses_2017_plus <- read_raw("responses-2017", "dta") %>%
     gender = n12gender,
     date_interview = n1intervie,
     workplace = n8workplac,
+    # What animals are present?
     contains("n18"),
+    # How many do you sell/process
     contains("n22"),
-    # Do you participate in paultry/pig slaughtering process?
+    # Do you participate in poultry/pig slaughtering process?
     slaughter = n49doyoupa,
   ) %>%
   mutate(
