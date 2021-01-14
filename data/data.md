@@ -11,6 +11,8 @@ tables by year (`study_year`).
   "Never", "Sometimes" or "Everyday"
 - `study_year` [num] Study year (e.g. 2015)
 - `workplace` [chr] Workplace
+- `sector` [chr] Sector (poultry or pig). 2015 questionnaire assumes everyone
+  is from the poultry sector
 
 # virus
 

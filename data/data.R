@@ -177,7 +177,11 @@ responses_2015 <- read_raw("responses-2015", "dta") %>%
 
 subjects_2015 <- responses_2015 %>%
   select(id, gender, age_years, slaughter, workplace) %>%
-  mutate(study_year = 2015)
+  mutate(
+    study_year = 2015,
+    # The questionnaire assumes everyone works with poultry
+    sector = "poultry"
+  )
 
 # Should be no duplicate ids
 subjects_2015 %>% check_no_duplicates(id)
@@ -318,6 +322,7 @@ responses_2017_plus <- read_raw("responses-2017", "dta") %>%
     gender = n12gender,
     date_interview = n1intervie,
     workplace = n8workplac,
+    sector = n15sector,
     # What animals are present?
     contains("n18"),
     # How many do you sell/process
@@ -329,12 +334,19 @@ responses_2017_plus <- read_raw("responses-2017", "dta") %>%
     # Remove visit indicator from id
     id_og = id,
     id = str_replace(id, "^\\d+", ""),
-    across(c(gender, slaughter, workplace), ~ as_factor(.x, levels = "labels")),
+    across(
+      c(gender, slaughter, workplace, sector),
+      ~ as_factor(.x, levels = "labels")
+    ),
     study_year = lubridate::year(date_interview),
+    sector = sector %>%
+      tolower() %>%
+      str_replace("business", "") %>%
+      str_trim()
   )
 
 subjects_2017_plus <- responses_2017_plus %>%
-  select(id, age_years, gender, slaughter, workplace, study_year)
+  select(id, age_years, gender, slaughter, workplace, sector, study_year)
 
 # Check missing data
 subjects_2017_plus %>% filter(!complete.cases(.))
@@ -350,6 +362,9 @@ unique(subjects_2017_plus$slaughter)
 
 # Check workplace
 responses_2017_plus$workplace %>% unique()
+
+# Check sector
+responses_2017_plus$sector %>% unique()
 
 # Check that ids don't repeat within a year
 subjects_2017_plus %>% check_no_duplicates(id, study_year)
