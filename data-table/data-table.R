@@ -118,24 +118,29 @@ summary_one_timepoint_combo <- function(t1_lbl, t2_lbl, data) {
       logt2_corrected = logt2 - b1 * (logt1 - reference),
       t2_corrected = exp(logt2_corrected),
       ratio_corrected = t2_corrected / 10,
-    ) %>%
-    group_by(study_year, virus) %>%
-    summarise(
-      n_individuals = length(unique(id)),
-      baseline = summarise_logmean(t1),
-      gmt = summarise_logmean(t2),
-      gmr = summarise_logmean(ratio),
-      gmt_corrected = summarise_logmean(t2_corrected),
-      gmr_corrected = summarise_logmean(ratio_corrected),
-      titre_above_40 = summarise_binary(t2 >= 40),
-      titre_above_40_below_before = summarise_binary(t2[t1 < 40] >= 40),
-      seroconv = summarise_binary(if_else(t1 == 5, t2 >= 40, ratio >= 4)),
+      titre_above_40 = t2 >= 40,
+      seroconv = if_else(t1 == 5, t2 >= 40, ratio >= 4),
       timepoints = glue::glue("{t2_lbl} vs {t1_lbl}"),
-      .groups = "drop"
     )
 }
+titre_summaries <-
+  pmap_dfr(timepoint_combos, summary_one_timepoint_combo, titre)
 
-pmap_dfr(timepoint_combos, summary_one_timepoint_combo, titre) %>%
+titre_summaries %>%
+  group_by(timepoints, study_year, virus) %>%
+  summarise(
+    n_individuals = length(unique(id)),
+    baseline = summarise_logmean(t1),
+    gmt = summarise_logmean(t2),
+    gmr = summarise_logmean(ratio),
+    gmt_corrected = summarise_logmean(t2_corrected),
+    gmr_corrected = summarise_logmean(ratio_corrected),
+    titre_above_40_prop = summarise_binary(titre_above_40),
+    titre_above_40_below_before_prop =
+      summarise_binary(titre_above_40[t1 < 40]),
+    seroconv = summarise_binary(seroconv),
+    .groups = "drop"
+  ) %>%
   select(study_year, timepoints, everything()) %>%
   save_data("titre")
 
