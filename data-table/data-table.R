@@ -29,7 +29,7 @@ summarise_factor <- function(fac) {
   map(sort(unique(fac)), one_level) %>% paste(collapse = "; ")
 }
 
-summarise_binary <- function(bin_vec) {
+summarise_binary <- function(bin_vec, return_everything = FALSE) {
   bin_vec <- na.omit(bin_vec)
   total <- length(bin_vec)
   success <- sum(bin_vec)
@@ -38,10 +38,14 @@ summarise_binary <- function(bin_vec) {
   ci <- PropCIs::exactci(success, total, 0.95)$conf.int
   low <- ci[[1]]
   high <- ci[[2]]
-  glue::glue(
+  summ <- glue::glue(
     "{success} / {total} ",
     "{format_percent(point)} ({format_percent(low)}, {format_percent(high)})"
   )
+  if (return_everything) {
+    return(tibble(total, success, failure, point, low, high, summ))
+  }
+  summ
 }
 
 summarise_logmean <- function(titres) {
@@ -70,6 +74,14 @@ save_data <- function(data, name) {
   data
 }
 
+save_plot <- function(plot, name, ...) {
+  ggdark::ggsave_dark(
+    glue::glue("data-table/{name}.pdf"), plot,
+    units = "cm",
+    ...
+  )
+}
+
 # Script ======================================================================
 
 subject <- read_data("subject")
@@ -80,6 +92,7 @@ subject %>%
     n = n() %>% as.character(),
     age = summarise_numeric(age_years),
     gender = summarise_factor(gender),
+    sector = summarise_factor(sector),
     .groups = "drop"
   ) %>%
   pivot_longer(-study_year, names_to = "stat", values_to = "summ") %>%
@@ -143,6 +156,44 @@ titre_summaries %>%
   ) %>%
   select(study_year, timepoints, everything()) %>%
   save_data("titre")
+
+# Infections (as defined by ratio >= 4)
+virus <- read_data("virus") %>%
+  mutate(lab = glue::glue("{short} ({haem})"))
+infection_summ <- titre_summaries %>%
+  mutate(infection = ratio >= 4) %>%
+  group_by(id, study_year, virus) %>%
+  summarise(infection = any(infection), .groups = "drop") %>%
+  inner_join(subject, c("id", "study_year")) %>%
+  inner_join(virus, "virus") %>%
+  group_by(study_year, sector, virus, haem) %>%
+  summarise(
+    summarise_binary(infection, return_everything = TRUE),
+    .groups = "drop"
+  )
+infection_summ_plot <- infection_summ %>%
+  ggplot(aes(virus, point)) +
+  ggdark::dark_theme_bw(verbose = FALSE) +
+  theme(
+    strip.background = element_blank(),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    panel.spacing = unit(0, "null")
+  ) +
+  facet_grid(study_year ~ sector, labeller = as_labeller(tools::toTitleCase)) +
+  scale_y_continuous("Infections", labels = scales::percent_format(1)) +
+  scale_x_discrete(
+    "Virus",
+    labels = as_labeller(function(labels) {
+      virus$lab[virus$virus == labels]
+    })
+  ) +
+  geom_pointrange(aes(ymin = low, ymax = high))
+save_plot(infection_summ_plot, "infection-summ", width = 20, height = 20)
+
+infection_summ %>%
+  select(sector, study_year, virus, haem, summ) %>%
+  pivot_wider(names_from = "sector", values_from = "summ") %>%
+  save_data("infection-summ")
 
 # Animal possession
 

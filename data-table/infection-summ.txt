@@ -1,0 +1,8 @@
+Proportion of infections (95% exact CI) per virus per year per sector.
+Infection defined as titre rise >= 4 between any two timepoints throughout the year.
+
+H1 infections seem higher in poultry, especially in 2018.
+H3 virus infections are consistently high. Especially in 2015.
+H5 and H7 infections are essentially non-existent.
+H9 infections are low except for poultry in 2018.
+B infections also low except poultry in 2015.
