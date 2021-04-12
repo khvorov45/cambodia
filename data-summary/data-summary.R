@@ -70,13 +70,13 @@ summarise_count <- function(count) {
 }
 
 save_data <- function(data, name) {
-  write_csv(data, glue::glue("data-table/{name}.csv"))
+  write_csv(data, glue::glue("data-summary/{name}.csv"))
   data
 }
 
 save_plot <- function(plot, name, ...) {
   ggdark::ggsave_dark(
-    glue::glue("data-table/{name}.pdf"), plot,
+    glue::glue("data-summary/{name}.pdf"), plot,
     units = "cm",
     ...
   )
