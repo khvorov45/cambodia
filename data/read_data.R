@@ -13,6 +13,12 @@ read_data <- function(name) {
     "A/Hong Kong/4801/2014-like",
     "A/Singapore/INFIMH-16-0019/2016-like",
     "A/Switzerland/8060/2017-like",
+    # B
+    ## Vic
+    "B/Brisbane/60/2008-like",
+    "B/Colorado/6/2017-like",
+    ## Yam
+    "B/Phuket/3073/2013-like",
     ## H5
     "A/duck/Cambodia/33W2M3/2013",
     "A/chicken/Cambodia/Z89W11M1/2015",
@@ -25,13 +31,7 @@ read_data <- function(name) {
     ## H9
     "A/chicken/Cambodia/a38W9M1/2016",
     "A/chicken/Cambodia/B18W4M1/2017",
-    "A/chicken/Cambodia/11K-22-3-C2/2018",
-    # B
-    ## Vic
-    "B/Brisbane/60/2008-like",
-    "B/Colorado/6/2017-like",
-    ## Yam
-    "B/Phuket/3073/2013-like"
+    "A/chicken/Cambodia/11K-22-3-C2/2018"
   )
   if (name == "titre") {
     col_types_specific <- list(
